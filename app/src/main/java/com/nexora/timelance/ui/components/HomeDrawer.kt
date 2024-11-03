@@ -7,58 +7,66 @@ import androidx.compose.runtime.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.tooling.preview.PreviewParameter
-import com.nexora.timelance.ui.theme.SecondColorLight
-import kotlinx.coroutines.CoroutineScope
+import androidx.compose.ui.unit.sp
+import com.nexora.timelance.ui.theme.PrimaryColorLight
+import com.nexora.timelance.ui.theme.TextColorLight
+import com.nexora.timelance.ui.theme.TextColorLightSecond
 import kotlinx.coroutines.launch
 
 class HomeDrawer {
 
     @Composable
     fun DrawerContent(
-        drawerState: DrawerState,
-        onMenuItemClick: (String) -> Unit // Callback при нажатии на элемент меню
+        drawerState: DrawerState = rememberDrawerState(DrawerValue.Closed),
+        onMenuItemClick: (String) -> Unit
     ) {
-        val scope = rememberCoroutineScope()
+        ModalDrawerSheet(
+            drawerContainerColor = MaterialTheme.colorScheme.background
+        ) {
+            val items = listOf("Home", "Contact", "About")
+            val selectedItem = remember { mutableStateOf(items[0]) }
+            val scope = rememberCoroutineScope()
 
-        // ModalNavigationDrawer с элементами меню
 
-        if (drawerState.isOpen) {
-            // Показываем ModalNavigationDrawer только если он открыт
-            ModalNavigationDrawer(
-                drawerState = drawerState,
-                drawerContent = {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .background(SecondColorLight)
-                            .padding(16.dp),
-                        contentAlignment = Alignment.Center // Align content to center
-                    ) {
-                        Column(
-                            horizontalAlignment = Alignment.CenterHorizontally // Center items in the column
-                        ) {
-                            Text(text = "Меню", style = MaterialTheme.typography.bodyLarge)
-                            Spacer(modifier = Modifier.height(8.dp))
-
-                            // Call the method to create menu items
-                            MenuItem("Элемент 1", onMenuItemClick, drawerState)
-                            MenuItem("Элемент 2", onMenuItemClick, drawerState)
-                            MenuItem("Элемент 3", onMenuItemClick, drawerState)
-                        }
-                    }
-                }
-            ) {
-                MainContent(scope, drawerState)
+            items.forEach { item ->
+                NavigationDrawerItem(
+                    label= { Text(item, fontSize = 22.sp) },
+                    selected = selectedItem.value==item,
+                    onClick = {
+                        scope.launch { drawerState.close() }
+                        selectedItem.value = item
+                    },
+                    colors = NavigationDrawerItemDefaults.colors(
+                        selectedContainerColor = Color.Transparent,
+                        unselectedContainerColor = Color.Transparent,
+                        selectedTextColor = TextColorLight,
+                        unselectedTextColor = TextColorLightSecond
+                    )
+                )
             }
-        } else {
-            MainContent(scope, drawerState)
         }
+
+//        Box(
+//            modifier = Modifier
+//                .fillMaxSize()
+//                .background(MaterialTheme.colorScheme.background),
+//            contentAlignment = Alignment.Center
+//        ) {
+//            Column(
+//                horizontalAlignment = Alignment.CenterHorizontally
+//            ) {
+//                Text(text = "Меню", style = MaterialTheme.typography.bodyLarge)
+//                Spacer(modifier = Modifier.height(8.dp))
+//
+//                // Example items
+//                MenuItem("Элемент 1", onMenuItemClick, drawerState)
+//                MenuItem("Элемент 2", onMenuItemClick, drawerState)
+//                MenuItem("Элемент 3", onMenuItemClick, drawerState)
+//            }
+//        }
     }
 
     // Method to create a clickable menu item
@@ -77,31 +85,6 @@ class HomeDrawer {
         )
     }
 
-    @Composable
-    private fun MainContent(
-        scope: CoroutineScope,
-        drawerState: DrawerState
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(40.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            IconButton(onClick = { scope.launch { drawerState.open() } }) {
-                Icon(Icons.Filled.Menu, contentDescription = "Открыть меню")
-            }
-
-            IconButton(onClick = { /* Handle search action */ }) {
-                Icon(
-                    imageVector = Icons.Filled.Search, // Use Material icon for search
-                    contentDescription = "Search",
-                    modifier = Modifier.size(24.dp) // Optional: Set icon size
-                )
-            }
-        }
-    }
 
     @Preview(showBackground = true)
     @Composable
