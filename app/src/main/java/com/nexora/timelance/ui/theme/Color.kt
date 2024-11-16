@@ -15,6 +15,8 @@ val Pink40 = Color(0xFF7D5260)
 
 val PrimaryColorLight = Color(0xFFEEF4ED)
 val SecondColorLight = Color(0xFFFFFFFF)
+val PrimaryAccentColorLight = Color(0xFF13315C)
+val SecondAccentColorLight = Color(0xFFFCA311)
 val TextColorLight = Color(0xFF13315C)
 val TextColorLightSecond = Color(0xFF34578F)
 val ButtonTextColorLight = PrimaryColorLight
