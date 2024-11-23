@@ -9,10 +9,13 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyHorizontalGrid
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
@@ -50,7 +53,7 @@ class SkillComp {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(200.dp)
+                .wrapContentHeight()
                 .background(SecondColorLight)
                 .padding(vertical = 20.dp)
         ) {
@@ -77,18 +80,15 @@ class SkillComp {
                 SkillGroupData("Practice"),
             )
 
-            LazyHorizontalGrid (
-                rows = GridCells.Fixed(1),
-                Modifier.height(50.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp),
+            LazyRow(
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
-                userScrollEnabled = true
+                modifier = Modifier.fillMaxWidth()
             ) {
                 items(groupTags) { item ->
                     Text(
                         text = item.name,
                         color = SecondAccentColorLight,
-                        style = MaterialTheme.typography.bodyLarge,
+                        style = MaterialTheme.typography.bodySmall,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                         modifier = Modifier
@@ -100,11 +100,7 @@ class SkillComp {
 
             }
 
-
-
             Spacer(modifier = Modifier.height(4.dp))
-
-
 
             Text(
                 text = "Timed: " + (timeTotalSeconds / 60 / 60).toString() + " hours",

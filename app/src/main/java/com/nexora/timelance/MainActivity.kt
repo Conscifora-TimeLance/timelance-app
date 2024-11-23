@@ -58,53 +58,14 @@ class MainActivity : ComponentActivity() {
     val menu = TimelanceMenu()
     val progressComp = ProgressComp();
 
+    @Preview(showBackground = true)
     @Composable
     fun MainNavHost(navController: NavHostController = rememberNavController()) {
         // TODO I DO NO LIKE THIS DUDE
 
-
-
-
-        NavHost(navController = navController, startDestination = "screen1") {
-            composable("screen1") { MainScreen(navController) }
-            composable("SkillHub") { skillHubScreen.Screen(navController) }
-        }
-    }
-
-    @Preview(showBackground = true)
-    @Composable
-    fun PreviewMainScreen() {
-        TimelanceTheme {
-            MainScreen(rememberNavController())
-        }
-    }
-
-    @Composable
-    fun MainScreen(navController: NavHostController) {
-
         val drawerState = rememberDrawerState(DrawerValue.Closed)
         val homeDrawer = HomeDrawer()
         val scope = rememberCoroutineScope()
-
-        // TODO отрефакторить в другое место
-        val progressItems = listOf(
-            ProgressData("Java Practice", "3H 17 min", 0.5f),
-            ProgressData("Japanese Vocabulary", "1H 7 min", 0.5f),
-            ProgressData("English Vocabulary", "47 min", 0.5f),
-            ProgressData("English Reading", "37 min", 0.5f),
-            ProgressData("English Reading", "37 min", 0.5f),
-            ProgressData("English Reading", "37 min", 0.5f)
-        )
-
-        val statisticsSevenDaysData = listOf(
-            DailyStat("3 Sep", 3, 0),
-            DailyStat("4 Sep", 2, 23),
-            DailyStat("5 Sep", 1, 15),
-            DailyStat("6 Sep", 4, 5),
-            DailyStat("7 Sep", 0, 45),
-            DailyStat("8 Sep", 2, 10),
-            DailyStat("9 Sep", 3, 30)
-        )
 
         val items = listOf("Home", "Contact", "About")
         val selectedItem = remember { mutableStateOf(items[0]) }
@@ -132,6 +93,7 @@ class MainActivity : ComponentActivity() {
                 modifier = Modifier
                     .padding(10.dp,5.dp)
                     .statusBarsPadding()
+                    .padding(bottom = 16.dp)
             ) {
 
                 Box(
@@ -142,11 +104,44 @@ class MainActivity : ComponentActivity() {
                             rememberScrollState()
                         )
                 ) {
+                    NavHost(navController = navController, startDestination = "HomeScreen") {
+                        composable("HomeScreen") { MainScreen() }
+                        composable("SkillHubScreen") { skillHubScreen.Screen() }
+                    }
+                }
+            }
 
-                    Column(
-                        modifier = Modifier
-                            .fillMaxSize()
-                    ) {
+        }
+
+    }
+
+    @Composable
+    fun MainScreen () {
+
+        // TODO отрефакторить в другое место
+        val progressItems = listOf(
+            ProgressData("Java Practice", "3H 17 min", 0.5f),
+            ProgressData("Japanese Vocabulary", "1H 7 min", 0.5f),
+            ProgressData("English Vocabulary", "47 min", 0.5f),
+            ProgressData("English Reading", "37 min", 0.5f),
+            ProgressData("English Reading", "37 min", 0.5f),
+            ProgressData("English Reading", "37 min", 0.5f)
+        )
+
+        val statisticsSevenDaysData = listOf(
+            DailyStat("3 Sep", 3, 0),
+            DailyStat("4 Sep", 2, 23),
+            DailyStat("5 Sep", 1, 15),
+            DailyStat("6 Sep", 4, 5),
+            DailyStat("7 Sep", 0, 45),
+            DailyStat("8 Sep", 2, 10),
+            DailyStat("9 Sep", 3, 30)
+        )
+
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+        ) {
 
 //            homeDrawer.DrawerContent(
 //                drawerState = drawerState,
@@ -155,73 +150,69 @@ class MainActivity : ComponentActivity() {
 //                }
 //            )
 
-                        // TODO HEADER MENU IS HERE
+            // TODO HEADER MENU IS HERE
 
-                        Column {
-                            Text(
-                                text = "Time management"
-                            )
-                            Spacer(modifier = Modifier.height(8.dp))
-                            Text(
-                                text = "7 H 16 M"
-                            )
-                        }
+            Column {
+                Text(
+                    text = "Time management"
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = "7 H 16 M"
+                )
+            }
 
-                        Row(
-                            modifier = Modifier
-                                .height(300.dp),
-                            horizontalArrangement = Arrangement.Start,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            CUIGraph().StatisticsGraph(statisticsSevenDaysData)
-                        }
+            Row(
+                modifier = Modifier
+                    .height(300.dp),
+                horizontalArrangement = Arrangement.Start,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                CUIGraph().StatisticsGraph(statisticsSevenDaysData)
+            }
 
-                        Text(
-                            text = "Today's recent tracking",
-                            style = MaterialTheme.typography.bodyLarge
-                        )
+            Text(
+                text = "Today's recent tracking",
+                style = MaterialTheme.typography.bodyLarge
+            )
 
-                        Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
-                        LazyVerticalGrid(
-                            columns = GridCells.Fixed(2),
-                            modifier = Modifier.height(200.dp),
-                            contentPadding = PaddingValues(8.dp),
-                            verticalArrangement = Arrangement.spacedBy(8.dp),
-                            horizontalArrangement = Arrangement.spacedBy(8.dp),
-                            userScrollEnabled = true
-                        ) {
-                            items(progressItems) { item ->
-                                progressComp.ProgressItem(
-                                    title = item.title,
-                                    time = item.time,
-                                    progress = item.progress
-                                )
-                            }
-                        }
-
-                        Column {
-                            Text(
-                                text = "Total Statistics",
-                            )
-                            Spacer(modifier = Modifier.height(8.dp))
-                            Text(
-                                text = "Time: 2000 H 56 M\nStreak days: 202 d"
-                            )
-                            Spacer(modifier = Modifier.height(16.dp))
-                            progressComp.ProgressItem(
-                                title = "Nearest goal: Java",
-                                time = "460 / 520 H",
-                                progress = 0.91f
-                            )
-                        }
-
-                        // TODO BOTTOM MENU IS HERE
-
-
-                    }
+            LazyVerticalGrid(
+                columns = GridCells.Fixed(2),
+                modifier = Modifier.height(200.dp),
+                contentPadding = PaddingValues(8.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                userScrollEnabled = true
+            ) {
+                items(progressItems) { item ->
+                    progressComp.ProgressItem(
+                        title = item.title,
+                        time = item.time,
+                        progress = item.progress
+                    )
                 }
             }
+
+            Column {
+                Text(
+                    text = "Total Statistics",
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = "Time: 2000 H 56 M\nStreak days: 202 d"
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+                progressComp.ProgressItem(
+                    title = "Nearest goal: Java",
+                    time = "460 / 520 H",
+                    progress = 0.91f
+                )
+            }
+
+            // TODO BOTTOM MENU IS HERE
+
 
         }
     }
