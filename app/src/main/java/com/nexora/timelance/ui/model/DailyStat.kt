@@ -1,4 +1,4 @@
-package com.nexora.timelance.data.model
+package com.nexora.timelance.ui.model
 
 data class DailyStat(val day: String, val hours: Int, val minutes: Int) {
     companion object {

@@ -1,5 +1,7 @@
 package com.nexora.timelance.ui.components
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.ui.Alignment
@@ -11,14 +13,19 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 
-import com.nexora.timelance.data.model.DailyStat;
+import com.nexora.timelance.ui.model.DailyStat;
 import com.nexora.timelance.ui.theme.ProgressFillColorLight
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
-class CUIGraph {
+class SkillGraph {
 
+    @RequiresApi(Build.VERSION_CODES.O)
     @Composable
     fun StatisticsGraph(dailyStats: List<DailyStat>) {
         val maxStat = dailyStats.maxByOrNull { it.hours * 60 + it.minutes } ?: DailyStat("", 0, 0)
+        val dateFormatter:DateTimeFormatter = DateTimeFormatter.ofPattern("dd MMM")
+        var date:LocalDate = LocalDate.now();
 
         Row(
             modifier = Modifier
@@ -35,7 +42,12 @@ class CUIGraph {
                     modifier = Modifier.width(40.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    // Столбик
+                    Text(
+                        text = date.format(dateFormatter),
+                        style = MaterialTheme.typography.bodySmall
+                    )
+                    date = date.minusDays(1);
+
                     Box(
                         modifier = Modifier
                             .width(20.dp)
@@ -43,7 +55,6 @@ class CUIGraph {
                             .background(ProgressFillColorLight)
                     )
 
-                    // Отображаем время над столбиком
                     Text(
                         // TODO make time (hour and minutes) convert to hour
                         text = if (stat.hours > 0) {
@@ -61,6 +72,7 @@ class CUIGraph {
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     @Preview(showBackground = true)
     @Composable
     fun PreviewStatisticsGraph() {

@@ -2,7 +2,7 @@ package com.nexora.timelance
 
 import com.nexora.timelance.corotutine.TimeTracker
 import com.nexora.timelance.corotutine.Timer
-import com.nexora.timelance.data.model.SkillTrack
+import com.nexora.timelance.domain.model.entity.SkillTrack
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.util.UUID

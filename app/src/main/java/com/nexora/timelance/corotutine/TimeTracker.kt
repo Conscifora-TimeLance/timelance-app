@@ -1,20 +1,19 @@
 package com.nexora.timelance.corotutine
 
-import com.nexora.timelance.data.model.SkillTrack
+import com.nexora.timelance.domain.model.entity.SkillTrack
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
-import java.util.UUID
 
 class TimeTracker {
 
     var job : Job? = null
     val scope : CoroutineScope = CoroutineScope(Dispatchers.Default)
 
-    fun start (skillTrack:SkillTrack) {
+    fun start (skillTrack: SkillTrack) {
         if (job?.isActive == true) {
             println("Timer is already running for ${skillTrack.nameTrack}!")
             return

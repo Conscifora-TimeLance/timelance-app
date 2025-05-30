@@ -28,15 +28,22 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.nexora.timelance.R
+import com.nexora.timelance.ui.screen.ShowSkillHubScreen
+import com.nexora.timelance.ui.theme.TimelanceTheme
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 class TimelanceMenu {
 
+    @Preview
     @Composable
-    fun PrevieMenus() {
+    fun PreviewMenus() {
+        TimelanceTheme {
+            BottomMenu(rememberNavController())
+        }
     }
 
     @Composable
@@ -92,7 +99,15 @@ class TimelanceMenu {
                     )
                 }
             }
-            Button(onClick = {}) { Text("НА") }
+            Button(onClick = {  navController.navigate("SkillScreen") }) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.skill_hub),
+                        contentDescription = "Skill Icon",
+                        modifier = Modifier.size(32.dp)
+                    )
+                }
+            }
             Button(onClick = {}) { Text("ОТ") }
         }
     }

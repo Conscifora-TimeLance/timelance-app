@@ -61,7 +61,7 @@ fun TimelanceTheme(
 
     MaterialTheme(
         colorScheme = colorScheme,
-        typography = PreviewTypography(),
+        typography = appTypography(),
         content = content
     )
 }
@@ -93,7 +93,8 @@ val AlegreyaSC = FontFamily(
     Font(R.font.alegreya_sc_italic, FontWeight.Normal)
 )
 
-val AppTypography = Typography(
+@Composable
+fun appTypography() = Typography(
     displayLarge = TextStyle(
         fontFamily = AlegreyaSC,
         fontWeight = FontWeight.Bold,
@@ -111,7 +112,7 @@ val AppTypography = Typography(
     ),
     bodyMedium = TextStyle(
         fontFamily = AlegreyaSC,
-        fontWeight = FontWeight.Bold,
+        fontWeight = FontWeight.Normal,
         fontSize = 14.sp
     )
 )

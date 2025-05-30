@@ -1,4 +1,4 @@
-package com.nexora.timelance.data.model
+package com.nexora.timelance.domain.model.entity
 
 import java.util.UUID
 
