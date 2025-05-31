@@ -1,13 +1,16 @@
 package com.nexora.timelance.data.repository.list
 
+import androidx.compose.ui.util.fastSumBy
 import com.nexora.timelance.domain.model.entity.Skill
 import com.nexora.timelance.domain.model.entity.TagSkillGroup
 import com.nexora.timelance.domain.model.relation.SkillWithTags
+import com.nexora.timelance.domain.repository.HistorySkillRepository
 import com.nexora.timelance.domain.repository.SkillRepository
 import com.nexora.timelance.domain.repository.TagRepository
 
 class SkillRepositoryImpl(
-    private val tagsRepository: TagRepository
+    private val tagsRepository: TagRepository,
+    private val historySkillRepository: HistorySkillRepository
 ): SkillRepository {
 
     val skills = mutableListOf<Skill>()
@@ -19,7 +22,7 @@ class SkillRepositoryImpl(
     }
 
     override fun updateSkill(skill: Skill): Skill {
-        val index = skills.indexOf(skill)
+        val index = skills.indexOf(skills.first { it.id == skill.id })
         return skills.set(index, skill)
     }
 
@@ -43,6 +46,13 @@ class SkillRepositoryImpl(
 
     override fun getAllSkillsWithTags(): List<SkillWithTags> {
         TODO("Not yet implemented")
+    }
+
+    override fun updateTotalSeconds() {
+        skills.forEach { it ->
+            val sumOfHistory = historySkillRepository.getHistoryBySkillId(it.id).sumOf { it.timeTackedSeconds }
+            updateSkill(it.copy(timeTotalSeconds = sumOfHistory))
+        }
     }
 
     override fun addTagToSkill(skillId: String, tagId: String) {

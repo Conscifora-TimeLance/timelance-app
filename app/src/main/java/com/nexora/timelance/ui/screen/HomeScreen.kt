@@ -19,28 +19,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
 import com.nexora.timelance.ui.model.DailyStat
 import com.nexora.timelance.ui.model.ProgressData
 import com.nexora.timelance.ui.components.SkillGraph
 import com.nexora.timelance.ui.components.ProgressItem
 import com.nexora.timelance.ui.theme.TimelanceTheme
 
-open class HomeScreen {
-
-    @Preview(showBackground = true)
-    @Composable
-    fun PreviewScreen() {
-        TimelanceTheme {
-            ShowHomeScreen()
-        }
-    }
-
-}
-
 @Composable
-fun ShowHomeScreen () {
+fun HomeScreen () {
 
     // TODO отрефакторить в другое место
     val progressItems = listOf(
@@ -141,5 +127,13 @@ fun ShowHomeScreen () {
         // TODO BOTTOM MENU IS HERE
 
 
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun PreviewScreen() {
+    TimelanceTheme {
+        HomeScreen()
     }
 }

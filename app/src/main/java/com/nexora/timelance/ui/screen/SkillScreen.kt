@@ -32,6 +32,7 @@ import androidx.compose.ui.unit.dp
 import com.nexora.timelance.R
 import com.nexora.timelance.ui.model.DailyStat
 import com.nexora.timelance.domain.model.entity.Tag
+import com.nexora.timelance.domain.service.SkillService
 import com.nexora.timelance.ui.components.SkillGraph
 import com.nexora.timelance.ui.theme.PrimaryAccentColorLight
 import com.nexora.timelance.ui.theme.SecondAccentColorLight
@@ -39,21 +40,22 @@ import com.nexora.timelance.ui.theme.TimelanceTheme
 import kotlinx.coroutines.launch
 import java.util.UUID
 
-class SkillScreen {
 
-    @Preview(showBackground = true)
-    @Composable
-    fun PreviewScreen() {
-        TimelanceTheme {
-            ShowSkillScreen()
-        }
+@Preview(showBackground = true)
+@Composable
+private fun PreviewScreen() {
+    TimelanceTheme {
+        SkillScreen(null, null)
     }
-
 }
 
+
 @Composable
-fun ShowSkillScreen () {
-    val skillGraph : SkillGraph = SkillGraph()
+fun SkillScreen(
+    skillId: String?,
+    skillService: SkillService?
+) {
+    val skillGraph: SkillGraph = SkillGraph()
 
     val statisticsSevenDaysData = listOf(
         DailyStat("3 Sep", 3, 0),
@@ -67,10 +69,10 @@ fun ShowSkillScreen () {
 
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
-    val count = remember{ mutableStateOf(0) }
+    val count = remember { mutableStateOf(0) }
 
 
-    Column (
+    Column(
         modifier = Modifier
             .fillMaxWidth()
             .padding(3.dp),
@@ -132,7 +134,7 @@ fun ShowSkillScreen () {
 
             Scaffold(
                 snackbarHost = { SnackbarHost(snackbarHostState) }
-            ){
+            ) {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth(),
@@ -149,12 +151,18 @@ fun ShowSkillScreen () {
                     ElevatedButton(
                         onClick = {
                             scope.launch {
-                                val result = snackbarHostState.showSnackbar("Timer is Started", "Ok", duration= SnackbarDuration.Short)
-    //                        if(result==SnackbarResult.ActionPerformed) count.value++
-                            } },
+                                val result = snackbarHostState.showSnackbar(
+                                    "Timer is Started",
+                                    "Ok",
+                                    duration = SnackbarDuration.Short
+                                )
+                                //                        if(result==SnackbarResult.ActionPerformed) count.value++
+                            }
+                        },
                         modifier =
-                            Modifier.padding(it)
-                                .fillMaxHeight()
+                        Modifier
+                            .padding(it)
+                            .fillMaxHeight()
                     ) {
                         Icon(
                             painter = painterResource(id = R.drawable.play),

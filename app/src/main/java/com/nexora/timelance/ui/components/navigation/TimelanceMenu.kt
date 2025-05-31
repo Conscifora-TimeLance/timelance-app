@@ -1,20 +1,14 @@
-package com.nexora.timelance.ui.components
+package com.nexora.timelance.ui.components.navigation
 
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountBox
-import androidx.compose.material.icons.filled.Build
-import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Button
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.Icon
@@ -30,7 +24,6 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.nexora.timelance.R
-import com.nexora.timelance.ui.screen.ShowSkillHubScreen
 import com.nexora.timelance.ui.theme.TimelanceTheme
 
 import kotlinx.coroutines.CoroutineScope
@@ -80,7 +73,7 @@ class TimelanceMenu {
                 .padding(bottom = 16.dp),
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
-            Button(onClick = { navController.navigate("HomeScreen") }) {
+            Button(onClick = { navController.navigate(AppDestinations.ROUTE_HOME_SCREEN) }) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(
                         painter = painterResource(id = R.drawable.home),
@@ -90,7 +83,7 @@ class TimelanceMenu {
                 }
             }
 
-            Button(onClick = { navController.navigate("SkillHubScreen") }) {
+            Button(onClick = { navController.navigate(AppDestinations.ROUTE_SKILL_HUB_SCREEN) }) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(
                         painter = painterResource(id = R.drawable.skill_hub),
@@ -99,7 +92,7 @@ class TimelanceMenu {
                     )
                 }
             }
-            Button(onClick = {  navController.navigate("SkillScreen") }) {
+            Button(onClick = {  navController.navigate(AppDestinations.ROUTE_SKILL_SCREEN) }) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(
                         painter = painterResource(id = R.drawable.skill_hub),

@@ -1,14 +1,10 @@
 package com.nexora.timelance.ui.screen
 
-import androidx.annotation.DrawableRes
-import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.text.input.TextFieldLineLimits
-import androidx.compose.foundation.text.input.clearText
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
@@ -23,36 +19,36 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.nexora.timelance.data.repository.list.HistorySkillRepositoryImpl
 import com.nexora.timelance.data.repository.list.SkillRepositoryImpl
 import com.nexora.timelance.data.repository.list.TagRepositoryImpl
+import com.nexora.timelance.data.service.SkillServiceImpl
 import com.nexora.timelance.domain.model.entity.Skill
 import com.nexora.timelance.domain.repository.SkillRepository
+import com.nexora.timelance.domain.service.SkillService
 import com.nexora.timelance.ui.theme.TimelanceTheme
 import java.util.UUID
 
-class AddSkillScreen {
 
-    @Preview(showBackground = true)
-    @Composable
-    fun PreviewScreen() {
-        TimelanceTheme {
-            val tagRepository = TagRepositoryImpl()
-            val skillRepository = SkillRepositoryImpl(tagRepository)
-            ShowSkillAddScreen(skillRepository)
-        }
+@Preview(showBackground = true)
+@Composable
+private fun PreviewScreen() {
+    TimelanceTheme {
+        val skillService = SkillServiceImpl()
+        SkillAddScreen(skillService, onSkillSavedAndNavigateBack = { println("Preview: called") } )
     }
-
 }
 
 @Composable
-fun ShowSkillAddScreen (
-    skillRepository: SkillRepository
+fun SkillAddScreen(
+    skillService: SkillService,
+    onSkillSavedAndNavigateBack: () -> Unit
 ) {
 
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
 
-    Column (
+    Column(
         modifier = Modifier
             .fillMaxWidth()
             .padding(3.dp),
@@ -81,9 +77,12 @@ fun ShowSkillAddScreen (
         )
 
 
-        Button(onClick = {skillRepository.saveSkill(
-            Skill(UUID.randomUUID().toString(), textState, 0)
-        )}) {
+        Button(onClick = {
+            skillService.createSkill(
+                Skill(UUID.randomUUID().toString(), textState, 0)
+            )
+            onSkillSavedAndNavigateBack()
+        }) {
             Text("SAVE")
         }
 

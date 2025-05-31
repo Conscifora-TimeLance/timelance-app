@@ -1,6 +1,6 @@
 package com.nexora.timelance.corotutine
 
-import com.nexora.timelance.domain.model.entity.SkillTrack
+import com.nexora.timelance.ui.model.SkillTrack
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job

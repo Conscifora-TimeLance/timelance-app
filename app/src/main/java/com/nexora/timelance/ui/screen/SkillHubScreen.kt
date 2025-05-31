@@ -28,41 +28,38 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.nexora.timelance.R
-import com.nexora.timelance.SKILL_ADD_SCREEN
 import com.nexora.timelance.data.repository.list.SkillRepositoryImpl
 import com.nexora.timelance.data.repository.list.TagRepositoryImpl
-import com.nexora.timelance.domain.model.dto.SkillDto
+import com.nexora.timelance.data.repository.list.HistorySkillRepositoryImpl
+import com.nexora.timelance.data.service.SkillServiceImpl
 import com.nexora.timelance.domain.model.entity.Skill
-import com.nexora.timelance.domain.model.entity.Tag
 import com.nexora.timelance.domain.repository.SkillRepository
+import com.nexora.timelance.domain.service.SkillService
 import com.nexora.timelance.ui.components.SkillItem
+import com.nexora.timelance.ui.components.navigation.AppDestinations
 import com.nexora.timelance.ui.theme.TimelanceTheme
 import java.util.UUID
 
-class SkillHubScreen {
 
-    @Preview(showBackground = true)
-    @Composable
-    fun PreviewScreen() {
-        TimelanceTheme {
-            val tagRepository = TagRepositoryImpl()
-            val skillRepository = SkillRepositoryImpl(tagRepository)
-            skillRepository.saveSkill(Skill(UUID.randomUUID().toString(), "Java Practice", 10000))
-            ShowSkillHubScreen(rememberNavController(), skillRepository)
-        }
+@Preview(showBackground = true)
+@Composable
+private fun PreviewScreen() {
+    TimelanceTheme {
+        val skillService = SkillServiceImpl()
+        SkillHubScreen(rememberNavController(), skillService)
     }
-
 }
 
+
 @Composable
-fun ShowSkillHubScreen(
+fun SkillHubScreen(
     navController: NavHostController,
-    skillRepository: SkillRepository
+    skillService: SkillService,
 ) {
 
     val scope = rememberCoroutineScope()
 
-    val skillDtoItems = skillRepository.getAll()
+    val skillDtoItems = skillService.getAllSkills()
 
 //        var skillItems by remember { mutableStateOf<List<SkillData>?>(null) } // Start with null to indicate loading
 //
@@ -92,7 +89,7 @@ fun ShowSkillHubScreen(
         // BY TIME
         // BY GROUP
 
-        Row (
+        Row(
             modifier = Modifier
                 .padding(10.dp)
         ) {
@@ -110,7 +107,7 @@ fun ShowSkillHubScreen(
                 contentScale = ContentScale.Crop
             )
 
-            Button(onClick = { navController.navigate(SKILL_ADD_SCREEN) }) {
+            Button(onClick = { navController.navigate(AppDestinations.ROUTE_SKILL_ADD_SCREEN) }) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(
                         painter = painterResource(id = R.drawable.play),
@@ -121,8 +118,6 @@ fun ShowSkillHubScreen(
             }
         }
 
-
-
         Spacer(modifier = Modifier.height(8.dp))
 
         // TODO CHANGE TO SOMETHING MORE RELIABLE
@@ -130,6 +125,7 @@ fun ShowSkillHubScreen(
             skillDtoItems == null -> {
                 LoadingIndicator()
             }
+
             else -> {
                 LazyColumn {
                     items(skillDtoItems) { skill ->

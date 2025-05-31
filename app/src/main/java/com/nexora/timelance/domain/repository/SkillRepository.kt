@@ -14,6 +14,7 @@ interface SkillRepository {
     fun getSkillWithTags(skillId: String): SkillWithTags?
     fun getAllSkillsWithTags(): List<SkillWithTags>
 
+    fun updateTotalSeconds()
     fun addTagToSkill(skillId: String, tagId: String)
     fun removeTagFromSkill(skillId: String, tagId: String)
     fun setTagsForSkill(skillId: String, tagIds: List<String>)

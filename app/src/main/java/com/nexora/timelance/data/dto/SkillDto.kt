@@ -1,4 +1,4 @@
-package com.nexora.timelance.domain.model.dto
+package com.nexora.timelance.data.dto
 
 import com.nexora.timelance.domain.model.entity.Tag
 
