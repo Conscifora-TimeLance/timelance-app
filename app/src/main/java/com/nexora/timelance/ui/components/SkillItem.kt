@@ -34,12 +34,20 @@ import java.util.UUID
 @Composable
 fun PreviewScreen() {
     TimelanceTheme {
-        SkillItem("Java Backend", listOf(Tag(UUID.randomUUID().toString(), "Java")), 140000)
+        SkillItem("Java Backend",
+            listOf(Tag(UUID.randomUUID().toString(), "Java")),
+            140000,
+            onClickNavigationToDetails = {})
     }
 }
 
 @Composable
-fun SkillItem(name: String, groupTags: List<Tag>, timeTotalSeconds: Long) {
+fun SkillItem(
+    name: String,
+    groupTags: List<Tag>,
+    timeTotalSeconds: Long,
+    onClickNavigationToDetails: () -> Unit,
+) {
     ElevatedCard(
         elevation = CardDefaults.cardElevation(
             defaultElevation = 6.dp,
@@ -58,7 +66,7 @@ fun SkillItem(name: String, groupTags: List<Tag>, timeTotalSeconds: Long) {
 //            .border(1.dp, color = PrimaryAccentColorLight)
             .padding(vertical = 10.dp, horizontal = 5.dp)
             .clickable {
-                println("To do something")
+                onClickNavigationToDetails()
             }
     ) {
         Column(

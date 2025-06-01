@@ -23,6 +23,10 @@ class SkillServiceImpl(): SkillService {
         skillRepository.updateTotalSeconds()
     }
 
+    override fun getSkillBySkillId(skillId: String): Skill {
+        return skillRepository.getSkillById(skillId)
+    }
+
     override fun getHistoryBySkillId(skillId: String): GroupHistorySkill {
         val skill = skillRepository.getSkillById(skillId)
         val histories = historySkillRepository.getHistoryBySkillId(skillId)

@@ -117,11 +117,11 @@ fun HomeScreen () {
                 text = "Time: 2000 H 56 M\nStreak days: 202 d"
             )
             Spacer(modifier = Modifier.height(16.dp))
-            ProgressItem(
-                title = "Nearest goal: Java",
-                time = "460 / 520 H",
-                progress = 0.91f
-            )
+//            ProgressItem(
+//                title = "Nearest goal: Java",
+//                time = "460 / 520 H",
+//                progress = 0.91f
+//            )
         }
 
         // TODO BOTTOM MENU IS HERE

@@ -30,6 +30,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.nexora.timelance.R
+import com.nexora.timelance.data.service.SkillServiceImpl
+import com.nexora.timelance.domain.model.entity.Skill
 import com.nexora.timelance.ui.model.DailyStat
 import com.nexora.timelance.domain.model.entity.Tag
 import com.nexora.timelance.domain.service.SkillService
@@ -45,16 +47,26 @@ import java.util.UUID
 @Composable
 private fun PreviewScreen() {
     TimelanceTheme {
-        SkillScreen(null, null)
+        val skillService = SkillServiceImpl()
+        val skillTest = Skill(UUID.randomUUID().toString(), "Test Preview", 0)
+        skillService.createSkill(skillTest)
+        SkillDetailsScreen(skillTest.id, skillService)
     }
 }
 
 
 @Composable
-fun SkillScreen(
+fun SkillDetailsScreen(
     skillId: String?,
-    skillService: SkillService?
+    skillService: SkillService
 ) {
+
+    val skillData = if(skillId.isNullOrBlank()) {
+        Skill(UUID.randomUUID().toString(), "Test", 0)
+    } else {
+        skillService.getSkillBySkillId(skillId)
+    }
+
     val skillGraph: SkillGraph = SkillGraph()
 
     val statisticsSevenDaysData = listOf(
@@ -78,7 +90,7 @@ fun SkillScreen(
             .padding(3.dp),
 //            .statusBarsPadding()
     ) {
-        Text("Name of skill", style = MaterialTheme.typography.bodyMedium)
+        Text(skillData.name, style = MaterialTheme.typography.bodyMedium)
 
         data class CarouselItem(
             val id: Int,
