@@ -1,26 +1,35 @@
 package com.nexora.timelance.ui.screen
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.hoverable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -34,11 +43,14 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.nexora.timelance.R
+import com.nexora.timelance.data.dto.SkillDto
 import com.nexora.timelance.data.service.SkillServiceImpl
 import com.nexora.timelance.domain.model.entity.Skill
 import com.nexora.timelance.domain.service.SkillService
@@ -49,6 +61,7 @@ import com.nexora.timelance.ui.theme.PrimaryAccentColorLight
 import com.nexora.timelance.ui.theme.SecondColorLight
 import com.nexora.timelance.ui.theme.TimelanceTheme
 import kotlinx.coroutines.launch
+import java.util.UUID
 
 
 @Preview(showBackground = true)
@@ -56,6 +69,9 @@ import kotlinx.coroutines.launch
 private fun PreviewScreen() {
     TimelanceTheme {
         val skillService = SkillServiceImpl()
+//        skillService.createSkill(Skill(UUID.randomUUID().toString(),
+//            name = "Java",
+//            timeTotalSeconds = 0))
         SkillHubScreen(
             rememberNavController(),
             onClickItemSkillNavigationToDetails = { println("Preview: called") },
@@ -93,75 +109,45 @@ fun SkillHubScreen(
         }
     }
 
-//        var skillItems by remember { mutableStateOf<List<SkillData>?>(null) } // Start with null to indicate loading
-//
-//        val coroutineScope = rememberCoroutineScope()
-//
-//        // Load data when the composable is first displayed
-//        LaunchedEffect(Unit) {
-//            coroutineScope.launch(Dispatchers.Default) {
-//                // Simulate a delay to mimic a long-running task
-//                delay(1000)
-//                TODO HERE IS LOAD DATA
-//                skillItems = data
-//            }
-//        }
-
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .statusBarsPadding(),
-    ) {
-
-        Text(
-            text = "Skill Hub"
-        )
-
-        // TODO FILTER OF SKILLS
-        // BY TIME
-        // BY GROUP
-
-        Row(
-            modifier = Modifier
-                .padding(10.dp)
-        ) {
-            Text(
-                text = "Filter by something: ",
-                style = MaterialTheme.typography.bodySmall
-            )
-
-            Image(
-                painter = painterResource(id = R.drawable.skill_hub),
-                contentDescription = null,
-                modifier = Modifier
-                    .size(40.dp)
-                    .clip(RoundedCornerShape(8.dp)),
-                contentScale = ContentScale.Crop
-            )
-
-            ButtonPrimary(
-                navController, AppDestinations.ROUTE_SKILL_ADD_SCREEN,
-                containerColor = SecondColorLight,
-                contentColor = PrimaryAccentColorLight,
-                contentDescription = "Add New Skill", R.drawable.add
-            )
-        }
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        // TODO CHANGE TO SOMETHING MORE RELIABLE
-        when {
-            state.isLoading -> {
-                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    CircularProgressIndicator()
-                }
+    Scaffold(
+        topBar = {
+            Text("Skill Hub")
+        },
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = { navController.navigate(AppDestinations.ROUTE_SKILL_ADD_SCREEN) }
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.Add,
+                    contentDescription = ""
+                )
             }
+        },
+        modifier = Modifier.fillMaxSize()
+    ) { innerPadding ->
 
-            state.error != null -> {
-                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text("Ошибка: ${state.error}", color = MaterialTheme.colorScheme.error)
-                        Button(onClick = {
+        Column(
+            modifier = Modifier
+                .padding(innerPadding)
+                .fillMaxSize()
+            // .padding(horizontal = 16.dp) // Общий горизонтальный отступ для контента, если нужен
+        ) {
+            FilterSection(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 8.dp)
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            when {
+                state.isLoading -> {
+                    LoadingState(modifier = Modifier.weight(1f)) // weight(1f) чтобы занять оставшееся место
+                }
+                state.error != null -> {
+                    ErrorState(
+                        errorMessage = state.error!!,
+                        onRetry = {
                             scope.launch {
                                 state = state.copy(isLoading = true, error = null)
                                 try {
@@ -174,41 +160,132 @@ fun SkillHubScreen(
                                     )
                                 }
                             }
-                        }) {
-                            Text("Повторить")
-                        }
-                    }
+                        },
+                        modifier = Modifier.weight(1f)
+                    )
+                }
+                state.skills.isEmpty() && !state.isLoading -> {
+                    EmptyState(
+                        onAddSkillClick = {  },
+                        modifier = Modifier.weight(1f)
+                    )
+                }
+                else -> {
+                    SkillList(
+                        skills = state.skills,
+                        onSkillItemClick = { skillId -> onClickItemSkillNavigationToDetails(skillId) },
+                        modifier = Modifier.weight(1f) // Список занимает оставшееся место
+                    )
                 }
             }
+        }
+    }
 
-            state.skills.isEmpty() && !state.isLoading -> {
-                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Text("Нет доступных навыков. Добавьте новый!")
-                }
-            }
+//        ButtonPrimary(
+//            navController, AppDestinations.ROUTE_SKILL_ADD_SCREEN,
+//            containerColor = SecondColorLight,
+//            contentColor = PrimaryAccentColorLight,
+//            contentDescription = "Add New Skill", R.drawable.add
+//        )
+}
+@Composable
+private fun FilterSection(modifier: Modifier = Modifier) {
+    Row(
+        modifier = modifier,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = "Filter by something", // "Filter by something: " - в ресурсы
+            style = MaterialTheme.typography.bodySmall
+        )
+        Spacer(modifier = Modifier.width(8.dp))
+        // TODO: Реализовать UI фильтров (чипы, дропдауны и т.д.)
+        Image( // Это пока просто заглушка, как я понимаю
+            painter = painterResource(id = R.drawable.skill_hub), // Убедитесь, что ресурс существует
+            contentDescription = null, // Добавьте описание, если оно не чисто декоративное
+            modifier = Modifier
+                .size(32.dp) // Уменьшил размер для строки фильтра
+                .clip(RoundedCornerShape(8.dp)),
+            contentScale = ContentScale.Crop
+        )
+    }
+}
 
-            else -> {
-                LazyColumn(
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    items(state.skills, key = { it.id }) { skill ->
-                        SkillItem(
-                            name = skill.name,
-                            groupTags = emptyList(),
-                            timeTotalSeconds = skill.timeTotalSeconds,
-                            onClickNavigationToDetails = {
-                                onClickItemSkillNavigationToDetails(skill.id)
-                            },
-                        )
-                    }
-                }
+@Composable
+private fun LoadingState(modifier: Modifier = Modifier) {
+    Box(
+        modifier = modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        CircularProgressIndicator()
+    }
+}
+
+@Composable
+private fun ErrorState(
+    errorMessage: String,
+    onRetry: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Box(
+        modifier = modifier.fillMaxSize().padding(16.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Text(
+                text = errorMessage,
+                color = MaterialTheme.colorScheme.error,
+                textAlign = TextAlign.Center
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+            Button(onClick = onRetry) {
+                Text("Retry") // "Повторить" - в ресурсы
             }
         }
     }
 }
 
 @Composable
-fun LoadingIndicator() {
-    Text(text = "Loading...")
+private fun EmptyState(onAddSkillClick: () -> Unit, modifier: Modifier = Modifier) {
+    Box(
+        modifier = modifier.fillMaxSize().padding(16.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Text(
+                text = "No skills available",
+                textAlign = TextAlign.Center,
+                style = MaterialTheme.typography.headlineSmall
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+            Button(onClick = onAddSkillClick) {
+                Text("Add skill")
+            }
+        }
+    }
+}
+
+@Composable
+private fun SkillList(
+    skills: List<Skill>,
+    onSkillItemClick: (skillId: String) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    LazyColumn(
+        modifier = modifier.fillMaxSize(), // Занимает все доступное пространство (внутри Column с weight)
+        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp), // Отступы для элементов списка
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        items(skills, key = { it.id}) { skill ->
+            SkillItem(
+                name = skill.name,
+                timeTotalSeconds = skill.timeTotalSeconds,
+                onClickNavigationToDetails = {
+                    onSkillItemClick(skill.id)
+                },
+                groupTags = emptyList()
+            )
+        }
+    }
 }
 
