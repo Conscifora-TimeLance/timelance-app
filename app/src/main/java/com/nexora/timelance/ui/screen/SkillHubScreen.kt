@@ -19,17 +19,11 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -57,6 +51,8 @@ import com.nexora.timelance.domain.service.SkillService
 import com.nexora.timelance.ui.components.SkillItem
 import com.nexora.timelance.ui.components.button.ButtonPrimary
 import com.nexora.timelance.ui.components.navigation.AppDestinations
+import com.nexora.timelance.ui.theme.ButtonBackColorLight
+import com.nexora.timelance.ui.theme.ButtonTextColorLight
 import com.nexora.timelance.ui.theme.PrimaryAccentColorLight
 import com.nexora.timelance.ui.theme.SecondColorLight
 import com.nexora.timelance.ui.theme.TimelanceTheme
@@ -110,18 +106,14 @@ fun SkillHubScreen(
     }
 
     Scaffold(
-        topBar = {
-            Text("Skill Hub")
-        },
         floatingActionButton = {
-            FloatingActionButton(
-                onClick = { navController.navigate(AppDestinations.ROUTE_SKILL_ADD_SCREEN) }
-            ) {
-                Icon(
-                    imageVector = Icons.Filled.Add,
-                    contentDescription = ""
-                )
-            }
+            ButtonPrimary(
+                containerColor = ButtonBackColorLight,
+                contentColor = ButtonTextColorLight,
+                contentDescription = "",
+                onClick = { navController.navigate(AppDestinations.ROUTE_SKILL_ADD_SCREEN) },
+                icon = R.drawable.add,
+            )
         },
         modifier = Modifier.fillMaxSize()
     ) { innerPadding ->
@@ -130,7 +122,6 @@ fun SkillHubScreen(
             modifier = Modifier
                 .padding(innerPadding)
                 .fillMaxSize()
-            // .padding(horizontal = 16.dp) // Общий горизонтальный отступ для контента, если нужен
         ) {
             FilterSection(
                 modifier = Modifier
@@ -174,19 +165,12 @@ fun SkillHubScreen(
                     SkillList(
                         skills = state.skills,
                         onSkillItemClick = { skillId -> onClickItemSkillNavigationToDetails(skillId) },
-                        modifier = Modifier.weight(1f) // Список занимает оставшееся место
+                        modifier = Modifier.weight(1f)
                     )
                 }
             }
         }
     }
-
-//        ButtonPrimary(
-//            navController, AppDestinations.ROUTE_SKILL_ADD_SCREEN,
-//            containerColor = SecondColorLight,
-//            contentColor = PrimaryAccentColorLight,
-//            contentDescription = "Add New Skill", R.drawable.add
-//        )
 }
 @Composable
 private fun FilterSection(modifier: Modifier = Modifier) {
@@ -239,7 +223,7 @@ private fun ErrorState(
             )
             Spacer(modifier = Modifier.height(16.dp))
             Button(onClick = onRetry) {
-                Text("Retry") // "Повторить" - в ресурсы
+                Text("Retry")
             }
         }
     }
@@ -258,9 +242,6 @@ private fun EmptyState(onAddSkillClick: () -> Unit, modifier: Modifier = Modifie
                 style = MaterialTheme.typography.headlineSmall
             )
             Spacer(modifier = Modifier.height(16.dp))
-            Button(onClick = onAddSkillClick) {
-                Text("Add skill")
-            }
         }
     }
 }

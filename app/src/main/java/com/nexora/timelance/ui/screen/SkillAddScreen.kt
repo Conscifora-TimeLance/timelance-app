@@ -16,16 +16,18 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.nexora.timelance.data.repository.list.HistorySkillRepositoryImpl
-import com.nexora.timelance.data.repository.list.SkillRepositoryImpl
-import com.nexora.timelance.data.repository.list.TagRepositoryImpl
+import com.nexora.timelance.R
 import com.nexora.timelance.data.service.SkillServiceImpl
 import com.nexora.timelance.domain.model.entity.Skill
 import com.nexora.timelance.domain.repository.SkillRepository
 import com.nexora.timelance.domain.service.SkillService
+import com.nexora.timelance.ui.components.button.ButtonPrimary
+import com.nexora.timelance.ui.theme.ButtonBackColorLight
+import com.nexora.timelance.ui.theme.ButtonTextColorLight
 import com.nexora.timelance.ui.theme.TimelanceTheme
 import java.util.UUID
 
@@ -52,10 +54,8 @@ fun SkillAddScreen(
         modifier = Modifier
             .fillMaxWidth()
             .padding(3.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text("Add Skill", style = MaterialTheme.typography.bodyMedium)
-
-
         val state = rememberTextFieldState()
 
         var textState by remember { mutableStateOf("") }
@@ -76,15 +76,22 @@ fun SkillAddScreen(
             }
         )
 
+        Spacer(modifier = Modifier.weight(1f))
 
-        Button(onClick = {
-            skillService.createSkill(
-                Skill(UUID.randomUUID().toString(), textState, 0)
-            )
-            onSkillSavedAndNavigateBack()
-        }) {
-            Text("SAVE")
-        }
+        ButtonPrimary(
+            onClick = {
+                skillService.createSkill(
+                    Skill(UUID.randomUUID().toString(), textState, 0)
+                )
+                onSkillSavedAndNavigateBack()
+            },
+            containerColor = ButtonBackColorLight,
+            contentColor = ButtonTextColorLight,
+            contentDescription = "",
+            icon = R.drawable.save,
+            textContent = "SAVE"
+
+        )
 
         Spacer(Modifier.height(2.dp))
     }

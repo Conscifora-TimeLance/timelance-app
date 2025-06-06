@@ -2,44 +2,51 @@ package com.nexora.timelance.ui.screen
 
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.sizeIn
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.nexora.timelance.R
+import com.nexora.timelance.corotutine.TimeTracker
 import com.nexora.timelance.data.service.SkillServiceImpl
 import com.nexora.timelance.domain.model.entity.Skill
 import com.nexora.timelance.ui.model.DailyStat
 import com.nexora.timelance.domain.model.entity.Tag
 import com.nexora.timelance.domain.service.SkillService
 import com.nexora.timelance.ui.components.SkillGraph
+import com.nexora.timelance.ui.components.button.ButtonPrimary
+import com.nexora.timelance.ui.theme.Pink40
 import com.nexora.timelance.ui.theme.PrimaryAccentColorLight
 import com.nexora.timelance.ui.theme.SecondAccentColorLight
+import com.nexora.timelance.ui.theme.SecondColorLight
 import com.nexora.timelance.ui.theme.TimelanceTheme
-import kotlinx.coroutines.launch
+import com.nexora.timelance.ui.theme.TimerActiveColorLight
 import java.util.UUID
 
 
@@ -90,7 +97,7 @@ fun SkillDetailsScreen(
             .padding(3.dp),
 //            .statusBarsPadding()
     ) {
-        Text(skillData.name, style = MaterialTheme.typography.bodyMedium)
+        Text(skillData.name, style = MaterialTheme.typography.titleLarge)
 
         data class CarouselItem(
             val id: Int,
@@ -115,7 +122,7 @@ fun SkillDetailsScreen(
                 Text(
                     text = item.name,
                     color = SecondAccentColorLight,
-                    style = MaterialTheme.typography.bodySmall,
+                    style = MaterialTheme.typography.titleMedium,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     modifier = Modifier
@@ -127,62 +134,52 @@ fun SkillDetailsScreen(
 
         }
 
-        Text("Last 7 days: 2m", style = MaterialTheme.typography.bodyMedium)
-        Text("Last 30 days: 5.5 h", style = MaterialTheme.typography.bodyMedium)
-        Text("Total: 6.30 h", style = MaterialTheme.typography.bodyMedium)
+        Text("Last 7 days: 2m", style = MaterialTheme.typography.titleMedium)
+        Text("Last 30 days: 5.5 h", style = MaterialTheme.typography.titleMedium)
+        Text("Total: 6.30 h", style = MaterialTheme.typography.titleMedium)
 
         skillGraph.StatisticsGraph(statisticsSevenDaysData)
 
-        OutlinedCard(
-            colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.surface,
-            ),
-            border = BorderStroke(1.dp, Color.Black),
-            modifier = Modifier
-                .fillMaxWidth()
-                .fillMaxHeight(0.5f)
-                .padding(15.dp)
-        ) {
+        val time = remember { mutableLongStateOf(0) }
+        val tracker = remember { TimeTracker() }
 
-            Scaffold(
-                snackbarHost = { SnackbarHost(snackbarHostState) }
-            ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Text(
-                        text = "Start Timer",
-                        modifier = Modifier
-                            .padding(16.dp)
-                            .fillMaxHeight(),
-                        textAlign = TextAlign.Center,
-                        style = MaterialTheme.typography.bodyLarge
-                    )
-                    ElevatedButton(
-                        onClick = {
-                            scope.launch {
-                                val result = snackbarHostState.showSnackbar(
-                                    "Timer is Started",
-                                    "Ok",
-                                    duration = SnackbarDuration.Short
-                                )
-                                //                        if(result==SnackbarResult.ActionPerformed) count.value++
-                            }
-                        },
-                        modifier =
-                        Modifier
-                            .padding(it)
-                            .fillMaxHeight()
-                    ) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.play),
-                            contentDescription = "Skill Icon",
-                            modifier = Modifier.size(32.dp)
-                        )
+        Column (
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            ButtonPrimary(
+                onClick = {
+                    if (tracker.isRunning) {
+                        tracker.stop()
+                    } else {
+                        tracker.start(time)
                     }
-                }
+                },
+                containerColor = PrimaryAccentColorLight,
+                contentColor = Color.White,
+                icon = if (tracker.isRunning) R.drawable.pause else R.drawable.play,
+                textContent = if (tracker.isRunning) "Pause" else "Start"
+            )
+
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
+            ) {
+                Text(
+                    text = tracker.formatTime(time.longValue),
+                    style = MaterialTheme.typography.displayLarge,
+                    modifier = Modifier
+                        .widthIn(min = 400.dp)
+                        .heightIn(min = 150.dp)
+                        .background(
+                            color = if (tracker.isRunning) TimerActiveColorLight else SecondColorLight,
+                            shape = RoundedCornerShape(8.dp)
+                        )
+                        .padding(horizontal = 100.dp, vertical = 40.dp),
+                    textAlign = TextAlign.Center
+                )
             }
         }
         Spacer(Modifier.height(2.dp))

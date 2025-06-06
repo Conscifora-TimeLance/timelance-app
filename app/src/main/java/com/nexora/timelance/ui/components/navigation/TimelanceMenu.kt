@@ -34,6 +34,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.nexora.timelance.R
+import com.nexora.timelance.ui.components.button.ButtonPrimary
 import com.nexora.timelance.ui.theme.PrimaryAccentColorLight
 import com.nexora.timelance.ui.theme.SecondAccentColorLight
 import com.nexora.timelance.ui.theme.SecondColorLight
@@ -103,21 +104,13 @@ class TimelanceMenu {
         navController: NavHostController, route: String,
         contentDescription: String, icon: Int
     ) {
-        Button(
+        ButtonPrimary(
             onClick = { navController.navigate(route) },
-            shape = RoundedCornerShape(8.dp),
-            colors = ButtonDefaults.elevatedButtonColors(
-                containerColor = PrimaryAccentColorLight,
-                contentColor = SecondAccentColorLight
-            )) {
-            Icon(
-                painter = painterResource(id = icon),
-                contentDescription = contentDescription,
-                modifier = Modifier
-                    .size(25.dp)
-            )
-        }
+            contentColor = SecondAccentColorLight,
+            containerColor = PrimaryAccentColorLight,
+            contentDescription = contentDescription,
+            icon = icon
+        )
     }
-
 }
 
