@@ -21,10 +21,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.nexora.timelance.R
-import com.nexora.timelance.data.service.SkillServiceImpl
-import com.nexora.timelance.domain.model.entity.Skill
-import com.nexora.timelance.domain.repository.SkillRepository
-import com.nexora.timelance.domain.service.SkillService
+import com.nexora.timelance.data.dto.SkillDto
+import com.nexora.timelance.data.service.impl.SkillServiceImpl
+import com.nexora.timelance.data.service.SkillService
+import com.nexora.timelance.domain.model.entity.Tag
 import com.nexora.timelance.ui.components.button.ButtonPrimary
 import com.nexora.timelance.ui.theme.ButtonBackColorLight
 import com.nexora.timelance.ui.theme.ButtonTextColorLight
@@ -43,7 +43,7 @@ private fun PreviewScreen() {
 
 @Composable
 fun SkillAddScreen(
-    skillService: SkillService,
+    skillService: SkillServiceImpl,
     onSkillSavedAndNavigateBack: () -> Unit
 ) {
 
@@ -81,7 +81,8 @@ fun SkillAddScreen(
         ButtonPrimary(
             onClick = {
                 skillService.createSkill(
-                    Skill(UUID.randomUUID().toString(), textState, 0)
+                    SkillDto(UUID.randomUUID().toString(), textState,
+                        listOf(skillService.createTag(Tag(name = "Empty"))), 0)
                 )
                 onSkillSavedAndNavigateBack()
             },

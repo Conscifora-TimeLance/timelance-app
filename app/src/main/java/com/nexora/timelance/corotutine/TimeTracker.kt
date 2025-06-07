@@ -51,10 +51,4 @@ class TimeTracker {
         val totalTime = (System.currentTimeMillis()) / 1000
         println("Timer stopped. Total time: ${totalTime}s")
     }
-
-    fun formatTime(seconds: Long): String {
-        val minutes = seconds / 60
-        val remainingSeconds = seconds % 60
-        return String.format("%02d:%02d", minutes, remainingSeconds)
-    }
 }

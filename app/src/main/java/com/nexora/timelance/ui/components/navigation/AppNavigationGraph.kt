@@ -22,12 +22,11 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.nexora.timelance.data.service.SkillServiceImpl
-import com.nexora.timelance.domain.service.SkillService
+import com.nexora.timelance.data.service.impl.SkillServiceImpl
+import com.nexora.timelance.data.service.SkillService
 import com.nexora.timelance.ui.components.navigation.AppDestinations.ROUTE_HOME_SCREEN
 import com.nexora.timelance.ui.components.navigation.AppDestinations.ROUTE_SKILL_ADD_SCREEN
 import com.nexora.timelance.ui.components.navigation.AppDestinations.ROUTE_SKILL_HUB_SCREEN
-import com.nexora.timelance.ui.components.navigation.AppDestinations.ROUTE_SKILLS_DETAIL_SCREEN
 import com.nexora.timelance.ui.screen.SkillAddScreen
 import com.nexora.timelance.ui.screen.HomeScreen
 import com.nexora.timelance.ui.screen.SkillHubScreen
@@ -65,7 +64,7 @@ fun AppNavigationGraph(
     scope: CoroutineScope = rememberCoroutineScope(),
     homeDrawer: HomeDrawer = HomeDrawer(),
     menu: TimelanceMenu = TimelanceMenu(),
-    skillService: SkillService,
+    skillService: SkillServiceImpl,
 ) {
     ModalNavigationDrawer(
         drawerState = drawerState,

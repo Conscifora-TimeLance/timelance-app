@@ -6,5 +6,5 @@ interface TagRepository {
     fun saveTag(tag: Tag): Tag
     fun updateTag(tag: Tag): Tag
     fun deleteTag(tag: Tag)
-    fun getTagById(idTag: String): Tag
+    fun getById(idTag: String): Tag
 }

@@ -1,6 +1,5 @@
 package com.nexora.timelance.data.repository.list
 
-import androidx.compose.ui.util.fastSumBy
 import com.nexora.timelance.domain.model.entity.Skill
 import com.nexora.timelance.domain.model.entity.TagSkillGroup
 import com.nexora.timelance.domain.model.relation.SkillWithTags
@@ -8,7 +7,7 @@ import com.nexora.timelance.domain.repository.HistorySkillRepository
 import com.nexora.timelance.domain.repository.SkillRepository
 import com.nexora.timelance.domain.repository.TagRepository
 
-class SkillRepositoryImpl(
+class SkillRepositoryList(
     private val tagsRepository: TagRepository,
     private val historySkillRepository: HistorySkillRepository
 ): SkillRepository {
@@ -40,7 +39,7 @@ class SkillRepositoryImpl(
 
     override fun getSkillWithTags(skillId: String): SkillWithTags? {
         val skill = skills.first { it.id == skillId }
-        val tags = skillsWithTags.filter { it.idSkill == skillId }.map { tagsRepository.getTagById(it.idTag) }.toList()
+        val tags = skillsWithTags.filter { it.skillId == skillId }.map { tagsRepository.getById(it.tagId) }.toList()
         return SkillWithTags(skill, tags)
     }
 

@@ -3,7 +3,7 @@ package com.nexora.timelance.data.repository.list
 import com.nexora.timelance.domain.model.entity.Tag
 import com.nexora.timelance.domain.repository.TagRepository
 
-class TagRepositoryImpl: TagRepository {
+class TagRepositoryList: TagRepository {
 
     val tags = mutableListOf<Tag>()
 
@@ -21,7 +21,7 @@ class TagRepositoryImpl: TagRepository {
         tags.remove(tag)
     }
 
-    override fun getTagById(idTag: String): Tag {
+    override fun getById(idTag: String): Tag {
         return tags.first() { it.id == idTag }
     }
 }

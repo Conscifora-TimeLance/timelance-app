@@ -28,6 +28,7 @@ import com.nexora.timelance.ui.theme.PrimaryAccentColorLight
 import com.nexora.timelance.ui.theme.SecondAccentColorLight
 import com.nexora.timelance.ui.theme.SecondColorLight
 import com.nexora.timelance.ui.theme.TimelanceTheme
+import com.nexora.timelance.util.TimeUtil.Companion.secondsToTrackedTime
 import java.util.UUID
 
 @Preview(showBackground = true)
@@ -105,7 +106,7 @@ fun SkillItem(
             Spacer(modifier = Modifier.height(4.dp))
 
             Text(
-                text = "Timed: " + (timeTotalSeconds / 60 / 60).toString() + " hours",
+                text = "Timed: " + secondsToTrackedTime(timeTotalSeconds),
                 style = MaterialTheme.typography.bodyLarge,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis

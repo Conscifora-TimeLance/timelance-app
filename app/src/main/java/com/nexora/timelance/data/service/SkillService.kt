@@ -1,16 +1,15 @@
-package com.nexora.timelance.domain.service
+package com.nexora.timelance.data.service
 
 import com.nexora.timelance.data.dto.GroupHistorySkill
-import com.nexora.timelance.data.repository.list.SkillRepositoryImpl
-import com.nexora.timelance.data.repository.list.TagRepositoryImpl
+import com.nexora.timelance.data.dto.SkillDto
 import com.nexora.timelance.domain.model.entity.HistorySkill
 import com.nexora.timelance.domain.model.entity.Skill
 
 interface SkillService {
 
-    fun createSkill(skill: Skill)
+    fun createSkill(skillDto: SkillDto): Skill
     fun addTrackHistoryBySkillId(history: HistorySkill)
-    fun getSkillBySkillId(skillId: String): Skill
+    fun getSkillBySkillId(skillId: String): SkillDto
     fun getHistoryBySkillId(skillId: String): GroupHistorySkill
     fun getAllSkills(): List<Skill>
 }

@@ -2,9 +2,8 @@ package com.nexora.timelance.data.repository.list
 
 import com.nexora.timelance.domain.model.entity.HistorySkill
 import com.nexora.timelance.domain.repository.HistorySkillRepository
-import com.nexora.timelance.domain.repository.SkillRepository
 
-class HistorySkillRepositoryImpl(): HistorySkillRepository {
+class HistorySkillRepositoryList(): HistorySkillRepository {
 
     private val histories = mutableListOf<HistorySkill>()
 
