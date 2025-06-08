@@ -41,14 +41,7 @@ class TimeTracker {
     }
 
     fun stop (){
-        if (job?.isActive != true) {
-            println("No timer is running!")
-            return
-        }
-
         job?.cancel()
         isRunning = false
-        val totalTime = (System.currentTimeMillis()) / 1000
-        println("Timer stopped. Total time: ${totalTime}s")
     }
 }

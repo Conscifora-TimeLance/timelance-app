@@ -1,4 +1,4 @@
-package com.nexora.timelance.ui.components
+package com.nexora.timelance.ui.components.card
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable

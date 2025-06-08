@@ -21,8 +21,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.nexora.timelance.ui.model.DailyStat
 import com.nexora.timelance.ui.model.ProgressData
-import com.nexora.timelance.ui.components.SkillGraph
-import com.nexora.timelance.ui.components.ProgressItem
+import com.nexora.timelance.ui.components.card.ProgressItem
+import com.nexora.timelance.ui.components.stat.StatisticsGraph
 import com.nexora.timelance.ui.theme.TimelanceTheme
 
 @Composable
@@ -81,7 +81,7 @@ fun HomeScreen () {
             horizontalArrangement = Arrangement.Start,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            SkillGraph().StatisticsGraph(statisticsSevenDaysData)
+            StatisticsGraph(statisticsSevenDaysData)
         }
 
         Text(

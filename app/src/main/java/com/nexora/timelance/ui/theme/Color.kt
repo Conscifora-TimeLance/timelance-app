@@ -21,6 +21,7 @@ val TextColorLight = Color(0xFF13315C)
 val TextColorLightSecond = Color(0xFF34578F)
 val ButtonTextColorLight = PrimaryColorLight
 val ButtonBackColorLight = Color(0xFF134074)
+val ButtonBackActiveColorLight = Color(0xFFEF767A)
 
 val TimerActiveColorLight = Color(0xFFDDE3EB)
 

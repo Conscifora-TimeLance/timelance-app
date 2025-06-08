@@ -1,6 +1,7 @@
 package com.nexora.timelance.util
 
 import java.util.Locale
+import java.util.StringJoiner
 
 class TimeUtil {
 
@@ -17,8 +18,11 @@ class TimeUtil {
             val hours = seconds / 3600
             val minutes = (seconds % 3600) / 60
             val remainingSeconds = seconds % 60
-            return String.format(Locale.getDefault(),
-                "%d h %d m %d s", hours, minutes, remainingSeconds)
+            val sj = StringJoiner(" ")
+            if (hours > 0) sj.add(String.format(Locale.getDefault(),"%d h", hours))
+            if (minutes > 0) sj.add(String.format(Locale.getDefault(),"%d m", minutes))
+            if (remainingSeconds > 0) sj.add(String.format(Locale.getDefault(),"%d s", remainingSeconds))
+            return sj.toString()
         }
     }
 }

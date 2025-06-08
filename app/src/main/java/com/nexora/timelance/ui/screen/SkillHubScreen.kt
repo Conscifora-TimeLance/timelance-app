@@ -42,7 +42,7 @@ import com.nexora.timelance.R
 import com.nexora.timelance.data.service.impl.SkillServiceImpl
 import com.nexora.timelance.domain.model.entity.Skill
 import com.nexora.timelance.data.service.SkillService
-import com.nexora.timelance.ui.components.SkillItem
+import com.nexora.timelance.ui.components.card.SkillItem
 import com.nexora.timelance.ui.components.button.ButtonPrimary
 import com.nexora.timelance.ui.components.navigation.AppDestinations
 import com.nexora.timelance.ui.theme.ButtonBackColorLight
@@ -99,10 +99,10 @@ fun SkillHubScreen(
     Scaffold(
         floatingActionButton = {
             ButtonPrimary(
+                onClick = { navController.navigate(AppDestinations.ROUTE_SKILL_ADD_SCREEN) },
                 containerColor = ButtonBackColorLight,
                 contentColor = ButtonTextColorLight,
                 contentDescription = "",
-                onClick = { navController.navigate(AppDestinations.ROUTE_SKILL_ADD_SCREEN) },
                 icon = R.drawable.add,
             )
         },
