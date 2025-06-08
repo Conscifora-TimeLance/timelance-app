@@ -42,6 +42,7 @@ import com.nexora.timelance.domain.model.entity.Tag
 import com.nexora.timelance.data.service.SkillService
 import com.nexora.timelance.ui.components.stat.StatisticsGraph
 import com.nexora.timelance.ui.components.button.ButtonPrimary
+import com.nexora.timelance.ui.components.button.TagItem
 import com.nexora.timelance.ui.components.card.HistoryItem
 import com.nexora.timelance.ui.theme.ButtonBackActiveColorLight
 import com.nexora.timelance.ui.theme.PrimaryAccentColorLight
@@ -60,18 +61,21 @@ import java.util.UUID
 private fun PreviewScreen() {
     TimelanceTheme {
         val skillService = SkillServiceImpl()
-        val skillTest = SkillDto(
-            UUID.randomUUID().toString(), "Test Preview",
-            listOf(Tag("1", "Backend")), 0
-        )
-        skillService.createSkill(skillTest)
-        skillService.addTrackHistoryBySkillId(
-            HistorySkill(
-                skillId = skillTest.skillId,
-                timeTackedSeconds = skillTest.timeTotalSeconds, date = LocalDate.now()
-            )
-        )
-        SkillDetailsScreen(skillTest.skillId, skillService)
+        val tagAndroid = skillService.createTag(Tag(UUID.randomUUID().toString(), "Android"))
+        val tagBackend = skillService.createTag(Tag(UUID.randomUUID().toString(), "Backend"))
+
+        val createSkill =
+            skillService.createSkill(SkillDto("1", "Java", listOf(tagBackend), 1400000))
+        val createSkill1 =
+            skillService.createSkill(SkillDto("2", "Kotlin", listOf(tagAndroid), 140000))
+
+        skillService.addTrackHistoryBySkillId(HistorySkill(skillId = createSkill.id, date = LocalDate.now(),
+            timeTackedSeconds = createSkill.timeTotalSeconds))
+
+        skillService.addTrackHistoryBySkillId(HistorySkill(skillId = createSkill1.id, date = LocalDate.now(),
+            timeTackedSeconds = createSkill1.timeTotalSeconds))
+
+        SkillDetailsScreen(createSkill.id, skillService)
     }
 }
 
@@ -176,17 +180,7 @@ private fun SectionGroupTags(groupTags: List<Tag>) {
             .padding(0.dp, 8.dp)
     ) {
         items(groupTags) { item ->
-            Text(
-                text = item.name,
-                color = SecondAccentColorLight,
-                style = MaterialTheme.typography.titleMedium,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-                modifier = Modifier
-                    .clip(RoundedCornerShape(5.dp))
-                    .background(PrimaryAccentColorLight)
-                    .padding(5.dp)
-            )
+            TagItem(item.name)
         }
 
     }
@@ -275,11 +269,18 @@ private fun SectionHistory(historyList: List<HistorySkill>) {
     LazyColumn(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(0.dp, 8.dp)
+            .padding(25.dp, 8.dp)
             .height(200.dp)
     ) {
         items(historyList) { item ->
             HistoryItem(item)
+            HorizontalDivider(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp),
+                thickness = 1.dp,
+                color = PrimaryAccentColorLight
+            )
         }
     }
 }

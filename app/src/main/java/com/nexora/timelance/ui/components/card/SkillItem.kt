@@ -24,6 +24,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.nexora.timelance.domain.model.entity.Tag
+import com.nexora.timelance.ui.components.button.TagItem
 import com.nexora.timelance.ui.theme.PrimaryAccentColorLight
 import com.nexora.timelance.ui.theme.SecondAccentColorLight
 import com.nexora.timelance.ui.theme.SecondColorLight
@@ -88,17 +89,7 @@ fun SkillItem(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 items(groupTags) { item ->
-                    Text(
-                        text = item.name,
-                        color = SecondAccentColorLight,
-                        style = MaterialTheme.typography.bodySmall,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                        modifier = Modifier
-                            .clip(RoundedCornerShape(5.dp))
-                            .background(PrimaryAccentColorLight)
-                            .padding(5.dp)
-                    )
+                    TagItem(item.name)
                 }
 
             }

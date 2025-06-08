@@ -17,6 +17,7 @@ val PrimaryColorLight = Color(0xFFEEF4ED)
 val SecondColorLight = Color(0xFFFFFFFF)
 val PrimaryAccentColorLight = Color(0xFF002252)
 val SecondAccentColorLight = Color(0xFFFCA311)
+val ThirdAccentColorLight = Color(0xFFDDE3EB)
 val TextColorLight = Color(0xFF13315C)
 val TextColorLightSecond = Color(0xFF34578F)
 val ButtonTextColorLight = PrimaryColorLight

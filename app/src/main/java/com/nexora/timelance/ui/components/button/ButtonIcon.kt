@@ -10,6 +10,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -29,13 +30,10 @@ fun ButtonIcon(
     iconSize: Dp = 15.dp,
     buttonSize: Dp = 25.dp
 ) {
-    Button(
+    IconButton(
         onClick = { onClick() },
-        colors = ButtonDefaults.elevatedButtonColors(),
         modifier = Modifier
             .size(buttonSize),
-        contentPadding = PaddingValues(0.dp),
-        border = null
     ) {
         Box(
             contentAlignment = Alignment.Center,

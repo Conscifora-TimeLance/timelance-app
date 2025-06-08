@@ -48,8 +48,12 @@ class SkillServiceImpl(): SkillService, TagService {
         return GroupHistorySkill(skill, histories)
     }
 
-    override fun getAllSkills(): List<Skill> {
-        return skillRepository.getAll()
+    override fun getAllSkills(): List<SkillDto> {
+        return skillRepository.getAll().map { SkillDto(it.id, it.name, getTagsBySkillId(it.id), it.timeTotalSeconds) }
+    }
+
+    override fun getTagsBySkillId (skillId: String): List<Tag> {
+        return tagSkillGroupRepository.getGroupsBySkillId(skillId).map { getTagById(it.tagId) }
     }
 
     override fun createTag(tag: Tag): Tag {

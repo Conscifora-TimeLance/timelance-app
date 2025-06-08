@@ -39,8 +39,8 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.nexora.timelance.R
+import com.nexora.timelance.data.dto.SkillDto
 import com.nexora.timelance.data.service.impl.SkillServiceImpl
-import com.nexora.timelance.domain.model.entity.Skill
 import com.nexora.timelance.data.service.SkillService
 import com.nexora.timelance.ui.components.card.SkillItem
 import com.nexora.timelance.ui.components.button.ButtonPrimary
@@ -68,7 +68,7 @@ private fun PreviewScreen() {
 }
 
 data class SkillHubState(
-    val skills: List<Skill> = emptyList(),
+    val skills: List<SkillDto> = emptyList(),
     val isLoading: Boolean = true,
     val error: String? = null
 )
@@ -239,7 +239,7 @@ private fun EmptyState(onAddSkillClick: () -> Unit, modifier: Modifier = Modifie
 
 @Composable
 private fun SkillList(
-    skills: List<Skill>,
+    skills: List<SkillDto>,
     onSkillItemClick: (skillId: String) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -248,14 +248,14 @@ private fun SkillList(
         contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp), // Отступы для элементов списка
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        items(skills, key = { it.id}) { skill ->
+        items(skills, key = { it.skillId}) { skill ->
             SkillItem(
                 name = skill.name,
                 timeTotalSeconds = skill.timeTotalSeconds,
                 onClickNavigationToDetails = {
-                    onSkillItemClick(skill.id)
+                    onSkillItemClick(skill.skillId)
                 },
-                groupTags = emptyList()
+                groupTags = skill.groupTags
             )
         }
     }
