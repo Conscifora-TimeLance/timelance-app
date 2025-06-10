@@ -6,4 +6,5 @@ interface TagService {
 
     fun createTag(tag: Tag): Tag
     fun getTagById(id: String): Tag
+    fun getAllTags(): List<Tag>
 }

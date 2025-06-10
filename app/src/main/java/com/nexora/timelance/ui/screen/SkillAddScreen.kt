@@ -36,6 +36,7 @@ import com.nexora.timelance.data.dto.SkillDto
 import com.nexora.timelance.data.service.impl.SkillServiceImpl
 import com.nexora.timelance.domain.model.entity.Tag
 import com.nexora.timelance.ui.components.ModernTagSelector
+import com.nexora.timelance.ui.components.SearchableExposedDropdownMenuBox
 import com.nexora.timelance.ui.components.TagChip
 import com.nexora.timelance.ui.components.button.ButtonPrimary
 import com.nexora.timelance.ui.theme.ButtonBackColorLight
@@ -68,21 +69,24 @@ fun SkillAddScreen(
         modifier = Modifier
             .fillMaxWidth()
             .padding(3.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
+//        horizontalAlignment = Alignment.CenterHorizontally
     ) {
         val state = rememberTextFieldState()
 
         var textState by remember { mutableStateOf("") }
         var expanded by remember { mutableStateOf(false) }
         val selectedTags = remember { mutableStateListOf<Tag>() }
-        val availableTags = listOf("Backend", "Frontend", "Mobile", "DevOps", "Java", "Kotlin")
+        val availableTags = skillService.getAllTags()
+
+        Text("Skill name", style = MaterialTheme.typography.titleLarge)
 
         OutlinedTextField(
             value = textState,
             onValueChange = { newText -> textState = newText },
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(5.dp),
             singleLine = true,
-            label = { Text("Enter skill name") },
             leadingIcon = {
                 Icon(
                     painter = painterResource(
@@ -101,11 +105,22 @@ fun SkillAddScreen(
             }
         )
 
-        ModernTagSelector(
+        Text("Tags", style = MaterialTheme.typography.titleLarge)
+
+        SearchableExposedDropdownMenuBox(
             availableTags, selectedTags,
             onTagSelected = { /* Обработка выбора */ },
             onTagRemoved = { /* Обработка удаления */ },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(5.dp)
         )
+
+//        ModernTagSelector(
+//            availableTags, selectedTags,
+//            onTagSelected = { /* Обработка выбора */ },
+//            onTagRemoved = { /* Обработка удаления */ },
+//        )
 
         Spacer(modifier = Modifier.weight(1f))
 
@@ -120,7 +135,7 @@ fun SkillAddScreen(
                     skillService.createSkill(
                         SkillDto(
                             UUID.randomUUID().toString(), textState,
-                            listOf(skillService.createTag(Tag(name = "Empty"))), 0
+                            selectedTags, 0
                         )
                     )
                     onSkillSavedAndNavigateBack()

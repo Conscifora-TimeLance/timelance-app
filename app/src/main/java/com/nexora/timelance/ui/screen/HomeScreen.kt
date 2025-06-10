@@ -38,15 +38,15 @@ fun HomeScreen () {
         ProgressData("English Reading", "37 min", 0.5f)
     )
 
-    val statisticsSevenDaysData = listOf(
-        DailyStat("3 Sep", 3, 0),
-        DailyStat("4 Sep", 2, 23),
-        DailyStat("5 Sep", 1, 15),
-        DailyStat("6 Sep", 4, 5),
-        DailyStat("7 Sep", 0, 45),
-        DailyStat("8 Sep", 2, 10),
-        DailyStat("9 Sep", 3, 30)
-    )
+//    val statisticsSevenDaysData = listOf(
+//        DailyStat("3 Sep", 0),
+//        DailyStat("4 Sep", 0),
+//        DailyStat("5 Sep", 0),
+//        DailyStat("6 Sep", 0),
+//        DailyStat("7 Sep", 0),
+//        DailyStat("8 Sep", 0),
+//        DailyStat("9 Sep", 0)
+//    )
 
     Column(
         modifier = Modifier
@@ -81,7 +81,7 @@ fun HomeScreen () {
             horizontalArrangement = Arrangement.Start,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            StatisticsGraph(statisticsSevenDaysData)
+//            StatisticsGraph(statisticsSevenDaysData)
         }
 
         Text(

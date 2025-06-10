@@ -27,15 +27,39 @@ class MainActivity : ComponentActivity() {
         val tagBackend = skillService.createTag(Tag(UUID.randomUUID().toString(), "Backend"))
 
         val createSkill =
-            skillService.createSkill(SkillDto("1", "Java", listOf(tagBackend), 1400000))
+            skillService.createSkill(SkillDto("1", "Java", listOf(tagBackend), 140000))
         val createSkill1 =
-            skillService.createSkill(SkillDto("2", "Kotlin", listOf(tagAndroid), 140000))
+            skillService.createSkill(SkillDto("2", "Kotlin", listOf(tagAndroid), 14000))
 
         skillService.addTrackHistoryBySkillId(HistorySkill(skillId = createSkill.id, date = LocalDate.now(),
-            timeTackedSeconds = createSkill.timeTotalSeconds))
+            timeTrackedSeconds = createSkill.timeTotalSeconds))
 
         skillService.addTrackHistoryBySkillId(HistorySkill(skillId = createSkill1.id, date = LocalDate.now(),
-            timeTackedSeconds = createSkill1.timeTotalSeconds))
+            timeTrackedSeconds = createSkill1.timeTotalSeconds))
+
+        skillService.addTrackHistoryBySkillId(HistorySkill(skillId = createSkill1.id, date = LocalDate.now().minusDays(8),
+            timeTrackedSeconds = 16000L))
+
+        skillService.addTrackHistoryBySkillId(HistorySkill(skillId = createSkill1.id, date = LocalDate.now().minusDays(7),
+            timeTrackedSeconds = 10000L))
+
+        skillService.addTrackHistoryBySkillId(HistorySkill(skillId = createSkill1.id, date = LocalDate.now().minusDays(6),
+            timeTrackedSeconds = 10000L))
+
+        skillService.addTrackHistoryBySkillId(HistorySkill(skillId = createSkill1.id, date = LocalDate.now().minusDays(5),
+            timeTrackedSeconds = 10000L))
+
+        skillService.addTrackHistoryBySkillId(HistorySkill(skillId = createSkill1.id, date = LocalDate.now().minusDays(4),
+            timeTrackedSeconds = 10000L))
+
+        skillService.addTrackHistoryBySkillId(HistorySkill(skillId = createSkill1.id, date = LocalDate.now().minusDays(3),
+            timeTrackedSeconds = 10000L))
+
+        skillService.addTrackHistoryBySkillId(HistorySkill(skillId = createSkill1.id, date = LocalDate.now().minusDays(2),
+            timeTrackedSeconds = 1000L))
+
+        skillService.addTrackHistoryBySkillId(HistorySkill(skillId = createSkill1.id, date = LocalDate.now().minusDays(1),
+            timeTrackedSeconds = 1000L))
 
         setContent {
             TimelanceTheme {

@@ -65,27 +65,27 @@ fun TimelanceTheme(
         content = content
     )
 }
-
-@Composable
-fun PreviewTypography(): Typography {
-    return Typography(
-        bodyLarge = TextStyle(
-            fontFamily = FontFamily.Serif,
-            fontWeight = FontWeight.Normal,
-            fontSize = 24.sp
-        ),
-        bodyMedium = TextStyle(
-            fontFamily = FontFamily.SansSerif,
-            fontWeight = FontWeight.Normal,
-            fontSize = 16.sp
-        ),
-        bodySmall = TextStyle(
-            fontFamily = FontFamily.SansSerif,
-            fontWeight = FontWeight.Normal,
-            fontSize = 14.sp
-        )
-    )
-}
+//
+//@Composable
+//fun PreviewTypography(): Typography {
+//    return Typography(
+//        bodyLarge = TextStyle(
+//            fontFamily = FontFamily.Serif,
+//            fontWeight = FontWeight.Normal,
+//            fontSize = 24.sp
+//        ),
+//        bodyMedium = TextStyle(
+//            fontFamily = FontFamily.SansSerif,
+//            fontWeight = FontWeight.Normal,
+//            fontSize = 16.sp
+//        ),
+//        bodySmall = TextStyle(
+//            fontFamily = FontFamily.SansSerif,
+//            fontWeight = FontWeight.Normal,
+//            fontSize = 14.sp
+//        )
+//    )
+//}
 
 val AlegreyaSC = FontFamily(
     Font(R.font.alegreya_sc_regular),

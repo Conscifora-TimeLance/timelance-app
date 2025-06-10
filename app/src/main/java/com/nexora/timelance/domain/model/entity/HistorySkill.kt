@@ -6,6 +6,6 @@ import java.util.UUID
 data class HistorySkill(
     val id: String = UUID.randomUUID().toString(),
     val skillId: String,
-    val timeTackedSeconds: Long,
+    val timeTrackedSeconds: Long,
     val date: LocalDate
 )

@@ -24,4 +24,8 @@ class TagRepositoryList: TagRepository {
     override fun getById(idTag: String): Tag {
         return tags.first() { it.id == idTag }
     }
+
+    override fun getAll(): List<Tag> {
+        return tags
+    }
 }

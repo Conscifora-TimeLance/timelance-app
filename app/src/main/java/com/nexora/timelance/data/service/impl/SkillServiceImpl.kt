@@ -25,6 +25,9 @@ class SkillServiceImpl(): SkillService, TagService {
             skillDto.name, skillDto.timeTotalSeconds)
         val saveSkill = skillRepository.saveSkill(skill)
         skillDto.groupTags.forEach { tag ->
+            if (tagRepository.getById(tag.id) == null) {
+                throw IllegalArgumentException("Tag not exist in database!")
+            }
             tagSkillGroupRepository.addTagToSkill(skill.id, tag.id)
         }
         return saveSkill
@@ -63,5 +66,9 @@ class SkillServiceImpl(): SkillService, TagService {
 
     override fun getTagById(id: String): Tag {
         return tagRepository.getById(id)
+    }
+
+    override fun getAllTags(): List<Tag> {
+        return tagRepository.getAll()
     }
 }

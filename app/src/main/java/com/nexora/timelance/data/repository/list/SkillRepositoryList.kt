@@ -49,7 +49,7 @@ class SkillRepositoryList(
 
     override fun updateTotalSeconds() {
         skills.forEach { it ->
-            val sumOfHistory = historySkillRepository.getHistoryBySkillId(it.id).sumOf { it.timeTackedSeconds }
+            val sumOfHistory = historySkillRepository.getHistoryBySkillId(it.id).sumOf { it.timeTrackedSeconds }
             updateSkill(it.copy(timeTotalSeconds = sumOfHistory))
         }
     }

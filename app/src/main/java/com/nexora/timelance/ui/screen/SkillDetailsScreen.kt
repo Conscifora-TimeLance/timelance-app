@@ -1,5 +1,7 @@
 package com.nexora.timelance.ui.screen
 
+import android.content.Context
+import android.content.Intent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -26,10 +28,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.nexora.timelance.R
@@ -37,16 +38,15 @@ import com.nexora.timelance.corotutine.TimeTracker
 import com.nexora.timelance.data.dto.SkillDto
 import com.nexora.timelance.domain.model.entity.HistorySkill
 import com.nexora.timelance.data.service.impl.SkillServiceImpl
-import com.nexora.timelance.ui.model.DailyStat
 import com.nexora.timelance.domain.model.entity.Tag
 import com.nexora.timelance.data.service.SkillService
+import com.nexora.timelance.data.service.TimerForegroundService
 import com.nexora.timelance.ui.components.stat.StatisticsGraph
 import com.nexora.timelance.ui.components.button.ButtonPrimary
 import com.nexora.timelance.ui.components.button.TagItem
 import com.nexora.timelance.ui.components.card.HistoryItem
 import com.nexora.timelance.ui.theme.ButtonBackActiveColorLight
 import com.nexora.timelance.ui.theme.PrimaryAccentColorLight
-import com.nexora.timelance.ui.theme.SecondAccentColorLight
 import com.nexora.timelance.ui.theme.SecondColorLight
 import com.nexora.timelance.ui.theme.TimelanceTheme
 import com.nexora.timelance.ui.theme.TimerActiveColorLight
@@ -69,11 +69,19 @@ private fun PreviewScreen() {
         val createSkill1 =
             skillService.createSkill(SkillDto("2", "Kotlin", listOf(tagAndroid), 140000))
 
-        skillService.addTrackHistoryBySkillId(HistorySkill(skillId = createSkill.id, date = LocalDate.now(),
-            timeTackedSeconds = createSkill.timeTotalSeconds))
+        skillService.addTrackHistoryBySkillId(
+            HistorySkill(
+                skillId = createSkill.id, date = LocalDate.now(),
+                timeTrackedSeconds = createSkill.timeTotalSeconds
+            )
+        )
 
-        skillService.addTrackHistoryBySkillId(HistorySkill(skillId = createSkill1.id, date = LocalDate.now(),
-            timeTackedSeconds = createSkill1.timeTotalSeconds))
+        skillService.addTrackHistoryBySkillId(
+            HistorySkill(
+                skillId = createSkill1.id, date = LocalDate.now(),
+                timeTrackedSeconds = createSkill1.timeTotalSeconds
+            )
+        )
 
         SkillDetailsScreen(createSkill.id, skillService)
     }
@@ -117,58 +125,44 @@ fun SkillDetailsScreen(
         } else {
             skillService.getSkillBySkillId(skillId)
         }
-        historyDto = (
-                if (skillId.isNullOrBlank()) {
-                    emptyList()
-                } else {
-                    skillService.getHistoryBySkillId(skillId).histories
-                }
-                )
-    }
-
-
-    val statisticsSevenDaysData = listOf(
-        DailyStat("3 Sep", 3, 0),
-        DailyStat("4 Sep", 2, 23),
-        DailyStat("5 Sep", 1, 15),
-        DailyStat("6 Sep", 4, 5),
-        DailyStat("7 Sep", 0, 45),
-        DailyStat("8 Sep", 2, 10),
-        DailyStat("9 Sep", 3, 30)
-    )
-
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(3.dp)
-            .verticalScroll(rememberScrollState()),
-    ) {
-        Text(skillDto.name, style = MaterialTheme.typography.titleLarge)
-
-        SectionGroupTags(skillDto.groupTags)
-        SectionDetails(skillDto)
-        StatisticsGraph(statisticsSevenDaysData)
-        SectionTracking(skillService, skillDto) {
-            skillDto = if (skillId.isNullOrBlank()) {
-                SkillDto(
-                    name = "Test", groupTags = listOf(Tag(UUID.randomUUID().toString(), "Backend")),
-                    timeTotalSeconds = 0
-                )
-            } else {
-                skillService.getSkillBySkillId(skillId)
-            }
-            historyDto = (
-                    if (skillId.isNullOrBlank()) {
-                        emptyList()
-                    } else {
-                        skillService.getHistoryBySkillId(skillId).histories
-                    }
-                    )
+        historyDto = if (skillId.isNullOrBlank()) {
+            emptyList()
+        } else {
+            skillService.getHistoryBySkillId(skillId).histories
         }
-        Spacer(Modifier.height(2.dp))
-        SectionHistory(historyDto)
-
     }
+
+
+    val statisticsSevenDaysData = if (skillId.isNullOrBlank()) {
+        emptyList()
+    } else {
+        skillService.getHistoryBySkillId(skillId).histories
+    }
+
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(3.dp)
+                .verticalScroll(rememberScrollState()),
+        ) {
+            Text(skillDto.name, style = MaterialTheme.typography.titleLarge)
+
+            SectionGroupTags(skillDto.groupTags)
+            SectionDetails(skillDto)
+            StatisticsGraph(statisticsSevenDaysData)
+            SectionTracking(
+                skillService = skillService,
+                skillDto = skillDto,
+                onTimerStop = {
+                    skillDto = skillService.getSkillBySkillId(skillDto.skillId)
+                    historyDto = skillService.getHistoryBySkillId(skillDto.skillId).histories
+                },
+                context = LocalContext.current
+            )
+            Spacer(Modifier.height(2.dp))
+            SectionHistory(historyDto)
+
+        }
 }
 
 @Composable
@@ -197,6 +191,7 @@ private fun SectionTracking(
     skillService: SkillService,
     skillDto: SkillDto,
     onTimerStop: () -> Unit,
+    context: Context,
 ) {
     val time = remember { mutableLongStateOf(0) }
     val tracker = remember { TimeTracker() }
@@ -223,9 +218,17 @@ private fun SectionTracking(
                     time.longValue = 0
                     showTimer = false
                     onTimerStop()
+
+                    val stopIntent = Intent(context, TimerForegroundService::class.java).apply {
+                        action = TimerForegroundService.ACTION_STOP_TIMER
+                    }
+                    context.startService(stopIntent)
                 } else {
                     tracker.start(time)
                     showTimer = true
+
+                    val startIntent = Intent(context, TimerForegroundService::class.java)
+                    context.startForegroundService(startIntent)
                 }
             },
             containerColor = if (tracker.isRunning) ButtonBackActiveColorLight else PrimaryAccentColorLight,

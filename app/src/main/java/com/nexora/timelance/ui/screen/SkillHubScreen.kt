@@ -81,7 +81,6 @@ fun SkillHubScreen(
 ) {
     var state by remember { mutableStateOf(SkillHubState()) }
     val scope = rememberCoroutineScope()
-    val skillDtoItems = skillService.getAllSkills()
 
     LaunchedEffect(key1 = skillService) {
         scope.launch {
