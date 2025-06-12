@@ -18,10 +18,11 @@ import androidx.compose.ui.unit.dp
 import com.nexora.timelance.ui.theme.ProgressBackgroundColorLight
 import com.nexora.timelance.ui.theme.ProgressFillColorLight
 import com.nexora.timelance.ui.theme.SecondColorLight
+import com.nexora.timelance.util.TimeUtil.Companion.secondsToTrackedTime
 import kotlin.math.roundToInt
 
 @Composable
-fun ProgressItem(title: String, time: String, progress: Float) {
+fun ProgressItem(title: String, time: Long, /*progress: Float*/) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -40,7 +41,7 @@ fun ProgressItem(title: String, time: String, progress: Float) {
 
         LinearProgressIndicator(
             progress = {
-                progress
+                100f
             },
             modifier = Modifier.fillMaxWidth(),
             color = ProgressFillColorLight,
@@ -49,14 +50,15 @@ fun ProgressItem(title: String, time: String, progress: Float) {
         Spacer(modifier = Modifier.height(4.dp))
 
 
-        val percent: String = (progress * 100).roundToInt().toString();
+        // val percent: String = (progress * 100).roundToInt().toString();
 
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Text(text = time, style = MaterialTheme.typography.bodySmall)
-            Text(text = "$percent%", style = MaterialTheme.typography.bodySmall)
+            Text(text = secondsToTrackedTime(time), style = MaterialTheme.typography.bodySmall)
+            // In the future here will be percent from goal/timed
+            // Text(text = "$percent%", style = MaterialTheme.typography.bodySmall)
         }
     }
 }

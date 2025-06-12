@@ -42,6 +42,8 @@ import com.nexora.timelance.R
 import com.nexora.timelance.data.dto.SkillDto
 import com.nexora.timelance.data.service.impl.SkillServiceImpl
 import com.nexora.timelance.data.service.SkillService
+import com.nexora.timelance.domain.model.entity.Tag
+import com.nexora.timelance.ui.components.SearchableExposedDropdownMenuBox
 import com.nexora.timelance.ui.components.card.SkillItem
 import com.nexora.timelance.ui.components.button.ButtonPrimary
 import com.nexora.timelance.ui.components.navigation.AppDestinations
@@ -77,22 +79,24 @@ data class SkillHubState(
 fun SkillHubScreen(
     navController: NavHostController,
     onClickItemSkillNavigationToDetails: (skillId: String) -> Unit,
-    skillService: SkillService,
+    skillService: SkillServiceImpl,
 ) {
     var state by remember { mutableStateOf(SkillHubState()) }
     val scope = rememberCoroutineScope()
+    val allTags = skillService.getAllTags()
+    val selectedTags = remember { mutableListOf<Tag>() }
 
-    LaunchedEffect(key1 = skillService) {
-        scope.launch {
-            state = state.copy(isLoading = true, error = null)
-            try {
-                val skills = skillService.getAllSkills()
-                state = state.copy(skills = skills, isLoading = false)
-            } catch (e: Exception) {
-                state = state.copy(isLoading = false, error = "Ошибка загрузки: ${e.message}")
-                e.printStackTrace()
-            }
+    state = state.copy(isLoading = true, error = null)
+    try {
+        val skills = if (selectedTags.isEmpty()) {
+            skillService.getAllSkills()
+        } else {
+            skillService.getSkillsByTags(selectedTags)
         }
+        state = state.copy(skills = skills, isLoading = false)
+    } catch (e: Exception) {
+        state = state.copy(isLoading = false, error = "Ошибка загрузки: ${e.message}")
+        e.printStackTrace()
     }
 
     Scaffold(
@@ -113,10 +117,15 @@ fun SkillHubScreen(
                 .padding(innerPadding)
                 .fillMaxSize()
         ) {
-            FilterSection(
+
+            SearchableExposedDropdownMenuBox(
+                allTags,
+                selectedTags,
+                onTagSelected = { /* Обработка выбора */ },
+                onTagRemoved = { /* Обработка удаления */ },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 8.dp)
+                    .padding(5.dp)
             )
 
             Spacer(modifier = Modifier.height(8.dp))
@@ -125,6 +134,7 @@ fun SkillHubScreen(
                 state.isLoading -> {
                     LoadingState(modifier = Modifier.weight(1f)) // weight(1f) чтобы занять оставшееся место
                 }
+
                 state.error != null -> {
                     ErrorState(
                         errorMessage = state.error!!,
@@ -145,12 +155,14 @@ fun SkillHubScreen(
                         modifier = Modifier.weight(1f)
                     )
                 }
+
                 state.skills.isEmpty() && !state.isLoading -> {
                     EmptyState(
-                        onAddSkillClick = {  },
+                        onAddSkillClick = { },
                         modifier = Modifier.weight(1f)
                     )
                 }
+
                 else -> {
                     SkillList(
                         skills = state.skills,
@@ -162,26 +174,14 @@ fun SkillHubScreen(
         }
     }
 }
+
 @Composable
 private fun FilterSection(modifier: Modifier = Modifier) {
     Row(
         modifier = modifier,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(
-            text = "Filter by something", // "Filter by something: " - в ресурсы
-            style = MaterialTheme.typography.bodySmall
-        )
-        Spacer(modifier = Modifier.width(8.dp))
-        // TODO: Реализовать UI фильтров (чипы, дропдауны и т.д.)
-        Image( // Это пока просто заглушка, как я понимаю
-            painter = painterResource(id = R.drawable.skill_hub), // Убедитесь, что ресурс существует
-            contentDescription = null, // Добавьте описание, если оно не чисто декоративное
-            modifier = Modifier
-                .size(32.dp) // Уменьшил размер для строки фильтра
-                .clip(RoundedCornerShape(8.dp)),
-            contentScale = ContentScale.Crop
-        )
+
     }
 }
 
@@ -202,7 +202,9 @@ private fun ErrorState(
     modifier: Modifier = Modifier
 ) {
     Box(
-        modifier = modifier.fillMaxSize().padding(16.dp),
+        modifier = modifier
+            .fillMaxSize()
+            .padding(16.dp),
         contentAlignment = Alignment.Center
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -222,7 +224,9 @@ private fun ErrorState(
 @Composable
 private fun EmptyState(onAddSkillClick: () -> Unit, modifier: Modifier = Modifier) {
     Box(
-        modifier = modifier.fillMaxSize().padding(16.dp),
+        modifier = modifier
+            .fillMaxSize()
+            .padding(16.dp),
         contentAlignment = Alignment.Center
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -244,10 +248,13 @@ private fun SkillList(
 ) {
     LazyColumn(
         modifier = modifier.fillMaxSize(), // Занимает все доступное пространство (внутри Column с weight)
-        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp), // Отступы для элементов списка
+        contentPadding = PaddingValues(
+            horizontal = 16.dp,
+            vertical = 8.dp
+        ), // Отступы для элементов списка
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        items(skills, key = { it.skillId}) { skill ->
+        items(skills, key = { it.skillId }) { skill ->
             SkillItem(
                 name = skill.name,
                 timeTotalSeconds = skill.timeTotalSeconds,

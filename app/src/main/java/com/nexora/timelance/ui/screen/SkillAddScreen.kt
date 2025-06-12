@@ -35,7 +35,6 @@ import com.nexora.timelance.R
 import com.nexora.timelance.data.dto.SkillDto
 import com.nexora.timelance.data.service.impl.SkillServiceImpl
 import com.nexora.timelance.domain.model.entity.Tag
-import com.nexora.timelance.ui.components.ModernTagSelector
 import com.nexora.timelance.ui.components.SearchableExposedDropdownMenuBox
 import com.nexora.timelance.ui.components.TagChip
 import com.nexora.timelance.ui.components.button.ButtonPrimary

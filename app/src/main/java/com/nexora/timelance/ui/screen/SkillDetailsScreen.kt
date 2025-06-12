@@ -102,7 +102,7 @@ fun SkillDetailsScreen(
                     timeTotalSeconds = 0
                 )
             } else {
-                skillService.getSkillBySkillId(skillId)
+                skillService.getSkillById(skillId)
             }
         )
     }
@@ -123,7 +123,7 @@ fun SkillDetailsScreen(
                 timeTotalSeconds = 0
             )
         } else {
-            skillService.getSkillBySkillId(skillId)
+            skillService.getSkillById(skillId)
         }
         historyDto = if (skillId.isNullOrBlank()) {
             emptyList()
@@ -139,30 +139,30 @@ fun SkillDetailsScreen(
         skillService.getHistoryBySkillId(skillId).histories
     }
 
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(3.dp)
-                .verticalScroll(rememberScrollState()),
-        ) {
-            Text(skillDto.name, style = MaterialTheme.typography.titleLarge)
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(3.dp)
+            .verticalScroll(rememberScrollState()),
+    ) {
+        Text(skillDto.name, style = MaterialTheme.typography.titleLarge)
 
-            SectionGroupTags(skillDto.groupTags)
-            SectionDetails(skillDto)
-            StatisticsGraph(statisticsSevenDaysData)
-            SectionTracking(
-                skillService = skillService,
-                skillDto = skillDto,
-                onTimerStop = {
-                    skillDto = skillService.getSkillBySkillId(skillDto.skillId)
-                    historyDto = skillService.getHistoryBySkillId(skillDto.skillId).histories
-                },
-                context = LocalContext.current
-            )
-            Spacer(Modifier.height(2.dp))
-            SectionHistory(historyDto)
+        SectionGroupTags(skillDto.groupTags)
+        SectionDetails(skillDto)
+        StatisticsGraph(statisticsSevenDaysData)
+        SectionTracking(
+            skillService = skillService,
+            skillDto = skillDto,
+            onTimerStop = {
+                skillDto = skillService.getSkillById(skillDto.skillId)
+                historyDto = skillService.getHistoryBySkillId(skillDto.skillId).histories
+            },
+            context = LocalContext.current
+        )
+        Spacer(Modifier.height(2.dp))
+        SectionHistory(historyDto)
 
-        }
+    }
 }
 
 @Composable
@@ -182,8 +182,10 @@ private fun SectionGroupTags(groupTags: List<Tag>) {
 
 @Composable
 private fun SectionDetails(skillData: SkillDto) {
-    Text("Skill Details", style = MaterialTheme.typography.titleMedium)
-    Text("Total: ${secondsToTrackedTime(skillData.timeTotalSeconds)}")
+    // Text("Skill Details", style = MaterialTheme.typography.titleMedium)
+    if (skillData.timeTotalSeconds != 0L) {
+        Text("Total: ${secondsToTrackedTime(skillData.timeTotalSeconds)}")
+    }
 }
 
 @Composable

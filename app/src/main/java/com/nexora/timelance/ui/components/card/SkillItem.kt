@@ -97,7 +97,7 @@ fun SkillItem(
             Spacer(modifier = Modifier.height(4.dp))
 
             Text(
-                text = "Timed: " + secondsToTrackedTime(timeTotalSeconds),
+                text = "Timed: " + if (timeTotalSeconds != 0L) secondsToTrackedTime(timeTotalSeconds) else 0,
                 style = MaterialTheme.typography.bodyLarge,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis

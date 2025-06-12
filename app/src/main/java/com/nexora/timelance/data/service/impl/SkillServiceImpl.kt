@@ -1,6 +1,6 @@
 package com.nexora.timelance.data.service.impl
 
-import com.nexora.timelance.data.dto.GroupHistorySkill
+import com.nexora.timelance.data.dto.SkillHistoryDto
 import com.nexora.timelance.data.dto.SkillDto
 import com.nexora.timelance.data.repository.list.HistorySkillRepositoryList
 import com.nexora.timelance.data.repository.list.SkillRepositoryList
@@ -38,17 +38,17 @@ class SkillServiceImpl(): SkillService, TagService {
         skillRepository.updateTotalSeconds()
     }
 
-    override fun getSkillBySkillId(skillId: String): SkillDto {
+    override fun getSkillById(skillId: String): SkillDto {
         val skill = skillRepository.getSkillById(skillId)
         val skillTagGroups = tagSkillGroupRepository.getGroupsBySkillId(skillId)
         val tags = skillTagGroups.map { tagSkillGroup -> tagRepository.getById(tagSkillGroup.tagId) }
         return SkillDto(skillId, skill.name, tags, skill.timeTotalSeconds)
     }
 
-    override fun getHistoryBySkillId(skillId: String): GroupHistorySkill {
+    override fun getHistoryBySkillId(skillId: String): SkillHistoryDto {
         val skill = skillRepository.getSkillById(skillId)
         val histories = historySkillRepository.getHistoryBySkillId(skillId)
-        return GroupHistorySkill(skill, histories)
+        return SkillHistoryDto(skill, histories)
     }
 
     override fun getAllSkills(): List<SkillDto> {
@@ -57,6 +57,21 @@ class SkillServiceImpl(): SkillService, TagService {
 
     override fun getTagsBySkillId (skillId: String): List<Tag> {
         return tagSkillGroupRepository.getGroupsBySkillId(skillId).map { getTagById(it.tagId) }
+    }
+
+    override fun getAllHistory(): List<SkillHistoryDto> {
+        return historySkillRepository.getAll()
+            .groupBy { skillRepository.getSkillById(it.skillId) }
+            .map { SkillHistoryDto(it.key, it.value) }
+    }
+
+    override fun getSkillsByTags(selectedTags: List<Tag>): List<SkillDto> {
+        return tagSkillGroupRepository.getGroupsByTags(selectedTags)
+            .map { group -> SkillDto(
+                group.skillId,
+                getSkillById(group.skillId).name,
+                getTagsBySkillId(group.skillId),
+                getSkillById(group.skillId).timeTotalSeconds) }
     }
 
     override fun createTag(tag: Tag): Tag {

@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
@@ -29,6 +30,9 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldColors
+import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -40,94 +44,10 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.nexora.timelance.domain.model.entity.Tag
+import com.nexora.timelance.ui.theme.SecondAccentColorLight
 import com.nexora.timelance.ui.theme.SecondColorLight
 import com.nexora.timelance.ui.theme.TextColorLight
 import com.nexora.timelance.ui.theme.ThirdAccentColorLight
-import java.util.UUID
-
-@Composable
-fun ModernTagSelector(
-    availableTags: List<String>,
-    selectedTags: MutableList<Tag>,
-    onTagSelected: (Tag) -> Unit,
-    onTagRemoved: (Tag) -> Unit
-) {
-    var query by remember { mutableStateOf("") }
-    var expanded by remember { mutableStateOf(false) }
-
-    val filteredTags = if (query.isEmpty()) {
-        availableTags
-    } else {
-        availableTags.filter { it.contains(query, ignoreCase = true) }
-    }
-
-    Column {
-        OutlinedTextField(
-            value = query,
-            onValueChange = { newText ->
-                query = newText
-                expanded = true
-            },
-            label = { Text("Select a tag") },
-            trailingIcon = {
-                Icon(
-                    imageVector = Icons.Default.ArrowDropDown,
-                    contentDescription = null
-                )
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-                .clickable { expanded = true },
-        )
-
-        if (expanded) {
-            DropdownMenu(
-                expanded = expanded,
-                onDismissRequest = { expanded = false },
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                if (filteredTags.isEmpty()) {
-                    DropdownMenuItem(
-                        text = { Text("No matching tags") },
-                        onClick = {}
-                    )
-                } else {
-                    filteredTags.forEach { tagName ->
-                        DropdownMenuItem(
-                            text = { Text(tagName) },
-                            onClick = {
-                                if (!selectedTags.any { it.name == tagName }) {
-                                    val newTag = Tag(UUID.randomUUID().toString(), tagName)
-                                    selectedTags.add(newTag)
-                                    onTagSelected(newTag)
-                                }
-                                query = ""
-                                expanded = false
-                            }
-                        )
-                    }
-                }
-            }
-        }
-
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .horizontalScroll(rememberScrollState()),
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            selectedTags.forEach { tag ->
-                TagChip(
-                    tag = tag,
-                    onRemove = {
-                        selectedTags.remove(tag)
-                        onTagRemoved(tag)
-                    }
-                )
-            }
-        }
-    }
-}
 
 @Composable
 fun TagChip(
@@ -170,9 +90,7 @@ fun SearchableExposedDropdownMenuBox(
     selectedTags: MutableList<Tag>,
     onTagSelected: (Tag) -> Unit,
     onTagRemoved: (Tag) -> Unit,
-    modifier: Modifier = Modifier
-        .fillMaxWidth()
-        .padding(0.dp)
+    modifier: Modifier
 ) {
     val context = LocalContext.current
     var expanded by remember { mutableStateOf(false) }
@@ -188,17 +106,25 @@ fun SearchableExposedDropdownMenuBox(
             }
         ) {
             TextField(
-                shape = CutCornerShape(10.dp),
+                shape = CutCornerShape(15.dp),
+                colors = TextFieldDefaults.colors(
+                    unfocusedTextColor = TextColorLight,
+                    focusedTextColor = TextColorLight,
+                    focusedSupportingTextColor = TextColorLight,
+                    disabledTextColor = TextColorLight,
+                    unfocusedContainerColor = ThirdAccentColorLight,
+                    focusedContainerColor = ThirdAccentColorLight
+                ),
                 value = selectedText,
                 onValueChange = { selectedText = it; expanded = true },
-                label = { Text(text = "Start typing the name of tag") },
+                label = { Text(text = "Start typing the name of tag", color = TextColorLight) },
                 trailingIcon = {
                     ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
                 modifier =
                     Modifier
                         .menuAnchor()
                         .fillMaxWidth()
-                        .background(SecondColorLight)
+                        .height(50.dp)
             )
 
             val filteredOptions =
@@ -254,5 +180,6 @@ private fun Preview () {
         mutableListOf(Tag("1", "Java"), Tag("2", name = "Kotlin")), mutableListOf(),
         onTagSelected = { /* Обработка выбора */ },
         onTagRemoved = { /* Обработка удаления */ },
+        modifier = Modifier
     )
 }

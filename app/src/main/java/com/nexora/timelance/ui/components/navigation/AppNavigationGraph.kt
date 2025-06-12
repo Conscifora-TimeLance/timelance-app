@@ -23,7 +23,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.nexora.timelance.data.service.impl.SkillServiceImpl
-import com.nexora.timelance.data.service.SkillService
 import com.nexora.timelance.ui.components.navigation.AppDestinations.ROUTE_HOME_SCREEN
 import com.nexora.timelance.ui.components.navigation.AppDestinations.ROUTE_SKILL_ADD_SCREEN
 import com.nexora.timelance.ui.components.navigation.AppDestinations.ROUTE_SKILL_HUB_SCREEN
@@ -99,7 +98,7 @@ fun AppNavigationGraph(
                     .padding(it)
             ) {
                 NavHost(navController = navController, startDestination = ROUTE_HOME_SCREEN) {
-                    composable(ROUTE_HOME_SCREEN) { HomeScreen() }
+                    composable(ROUTE_HOME_SCREEN) { HomeScreen(skillService) }
                     composable(ROUTE_SKILL_HUB_SCREEN) {
                         SkillHubScreen(
                             navController,

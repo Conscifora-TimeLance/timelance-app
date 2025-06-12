@@ -1,5 +1,6 @@
 package com.nexora.timelance.data.repository.list
 
+import com.nexora.timelance.domain.model.entity.Tag
 import com.nexora.timelance.domain.model.entity.TagSkillGroup
 import com.nexora.timelance.domain.repository.SkillTagGroupRepository
 
@@ -15,5 +16,9 @@ class TagSkillGroupRepositoryList(
 
     override fun getGroupsBySkillId(skillId: String): List<TagSkillGroup> {
         return skillTagGroupList.filter { it.skillId == skillId }
+    }
+
+    override fun getGroupsByTags(selectedTags: List<Tag>): List<TagSkillGroup> {
+        return skillTagGroupList.filter { group -> selectedTags.any() { group.tagId == it.id } }
     }
 }
