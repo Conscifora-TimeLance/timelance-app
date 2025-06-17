@@ -1,6 +1,7 @@
 package com.nexora.timelance.ui.components.button
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
@@ -11,16 +12,16 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.nexora.timelance.ui.theme.PrimaryAccentColorLight
-import com.nexora.timelance.ui.theme.SecondAccentColorLight
+import com.nexora.timelance.domain.model.entity.Tag
 import com.nexora.timelance.ui.theme.TextColorLight
 import com.nexora.timelance.ui.theme.ThirdAccentColorLight
 
 @Preview
 @Composable
-fun TagItem (tagName: String = "Java") {
+fun TagItem (tag: Tag = Tag("1", "Java"),
+             onClick: (tagName: String) -> Unit = {}) {
     Text(
-        text = tagName,
+        text = tag.name,
         color = TextColorLight,
         style = MaterialTheme.typography.titleSmall,
         maxLines = 1,
@@ -28,6 +29,9 @@ fun TagItem (tagName: String = "Java") {
         modifier = Modifier
             .clip(RoundedCornerShape(5.dp))
             .background(ThirdAccentColorLight)
+            .clickable {
+                onClick(tag.id)
+            }
             .padding(8.dp, 5.dp)
     )
 }

@@ -89,7 +89,7 @@ fun SkillItem(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 items(groupTags) { item ->
-                    TagItem(item.name)
+                    TagItem(item)
                 }
 
             }

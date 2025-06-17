@@ -83,7 +83,7 @@ private fun PreviewScreen() {
             )
         )
 
-        SkillDetailsScreen(createSkill.id, skillService)
+        SkillDetailsScreen(createSkill.id, skillService, { println() })
     }
 }
 
@@ -91,7 +91,8 @@ private fun PreviewScreen() {
 @Composable
 fun SkillDetailsScreen(
     skillId: String?,
-    skillService: SkillService
+    skillService: SkillService,
+    onTagToSkillHubFilter: (tagName : String) -> Unit
 ) {
 
     var skillDto by remember {
@@ -147,7 +148,7 @@ fun SkillDetailsScreen(
     ) {
         Text(skillDto.name, style = MaterialTheme.typography.titleLarge)
 
-        SectionGroupTags(skillDto.groupTags)
+        SectionGroupTags(skillDto.groupTags, onTagToSkillHubFilter)
         SectionDetails(skillDto)
         StatisticsGraph(statisticsSevenDaysData)
         SectionTracking(
@@ -166,7 +167,8 @@ fun SkillDetailsScreen(
 }
 
 @Composable
-private fun SectionGroupTags(groupTags: List<Tag>) {
+private fun SectionGroupTags(groupTags: List<Tag>,
+                             onTagToSkillHubFilter: (tagName : String) -> Unit = {}) {
     LazyRow(
         horizontalArrangement = Arrangement.spacedBy(8.dp),
         modifier = Modifier
@@ -174,7 +176,7 @@ private fun SectionGroupTags(groupTags: List<Tag>) {
             .padding(0.dp, 8.dp)
     ) {
         items(groupTags) { item ->
-            TagItem(item.name)
+            TagItem(item, onTagToSkillHubFilter)
         }
 
     }
