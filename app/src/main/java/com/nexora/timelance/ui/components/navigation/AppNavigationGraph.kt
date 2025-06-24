@@ -1,5 +1,6 @@
 package com.nexora.timelance.ui.components.navigation
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 
@@ -12,26 +13,35 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.nexora.timelance.data.service.impl.SkillServiceImpl
 import com.nexora.timelance.ui.components.navigation.AppDestinations.ROUTE_HOME_SCREEN
 import com.nexora.timelance.ui.components.navigation.AppDestinations.ROUTE_SKILL_ADD_SCREEN
 import com.nexora.timelance.ui.components.navigation.AppDestinations.ROUTE_SKILL_HUB_SCREEN
+import com.nexora.timelance.ui.components.search.GlobalSearchResultsOverlay
 import com.nexora.timelance.ui.screen.SkillAddScreen
 import com.nexora.timelance.ui.screen.HomeScreenDestination
 import com.nexora.timelance.ui.screen.SkillHubScreen
 import com.nexora.timelance.ui.screen.SkillDetailsScreen
+import com.nexora.timelance.ui.screen.SkillHubState
 import com.nexora.timelance.ui.theme.TimelanceTheme
+import com.nexora.timelance.ui.viewmodel.GlobalSearchViewModel
 import com.nexora.timelance.ui.viewmodel.HomeViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -69,6 +79,18 @@ fun AppNavigationGraph(
     menu: TimelanceMenu = TimelanceMenu(),
     skillService: SkillServiceImpl,
 ) {
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentRoute = navBackStackEntry?.destination?.route
+
+    val globalSearchViewModel: GlobalSearchViewModel = remember { GlobalSearchViewModel(skillService) }
+    val globalSearchUiState by globalSearchViewModel.uiState.collectAsState()
+    val keyboardController = LocalSoftwareKeyboardController.current
+
+    BackHandler(enabled = globalSearchUiState.isSearchActive) {
+        globalSearchViewModel.toggleSearchActive()
+        keyboardController?.hide()
+    }
+
     ModalNavigationDrawer(
         drawerState = drawerState,
         drawerContent = {
@@ -82,9 +104,36 @@ fun AppNavigationGraph(
         }
 
     ) {
+
+        val screenTitle = when (currentRoute) {
+            ROUTE_HOME_SCREEN -> "Home"
+            ROUTE_SKILL_HUB_SCREEN, AppDestinations.ROUTE_SKILL_HUB_SCREEN_WITH_ARG -> "Skill Hub"
+            ROUTE_SKILL_ADD_SCREEN -> "Add Skill"
+            AppDestinations.ROUTE_SKILL_DETAILS_SCREEN_WITH_ARG -> "Skill Details"
+            else -> "TimeLance"
+        }
+
         Scaffold(
+
             topBar = {
-                menu.Header(drawerState = drawerState, scope = scope)
+//                menu.Header(drawerState = drawerState, scope = scope, screenTitle)
+
+                menu.AppHeader(
+                    title = screenTitle,
+                    drawerState = drawerState,
+                    scope = scope,
+                    isGlobalSearchActive = globalSearchUiState.isSearchActive,
+                    globalSearchQuery = globalSearchUiState.searchQuery,
+                    onGlobalSearchQueryChange = globalSearchViewModel::onSearchQueryChange,
+                    onGlobalSearchToggle = {
+                        globalSearchViewModel.toggleSearchActive()
+                        if (!globalSearchUiState.isSearchActive) keyboardController?.hide() // Скрываем клаву при закрытии
+                    },
+                    onGlobalSearchSubmit = { query ->
+                        globalSearchViewModel.onSearchSubmit(query)
+                        keyboardController?.hide()
+                    }
+                )
             },
 
             bottomBar = {
@@ -172,6 +221,20 @@ fun AppNavigationGraph(
                         )
                     }
                 }
+
+                GlobalSearchResultsOverlay(
+                    uiState = globalSearchUiState,
+                    onSkillClick = { skill ->
+                        globalSearchViewModel.toggleSearchActive()
+                        keyboardController?.hide()
+                        globalSearchViewModel.clearSearchResultsAndQuery()
+                        navController.navigate("${AppDestinations.ROUTE_SKILLS_DETAIL_SCREEN}/${skill.skillId}")
+                    },
+                    onDismissRequest = {
+                        globalSearchViewModel.toggleSearchActive()
+                        keyboardController?.hide()
+                    }
+                )
             }
         }
     }

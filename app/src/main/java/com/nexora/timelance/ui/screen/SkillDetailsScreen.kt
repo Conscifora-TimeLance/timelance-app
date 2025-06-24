@@ -1,7 +1,10 @@
 package com.nexora.timelance.ui.screen
 
+import android.app.ActivityManager
+import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -20,12 +23,16 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -33,6 +40,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
 import com.nexora.timelance.R
 import com.nexora.timelance.corotutine.TimeTracker
 import com.nexora.timelance.data.dto.SkillDto
@@ -197,9 +205,34 @@ private fun SectionTracking(
     onTimerStop: () -> Unit,
     context: Context,
 ) {
-    val time = remember { mutableLongStateOf(0) }
-    val tracker = remember { TimeTracker() }
-    var showTimer by remember { mutableStateOf(false) }
+    var elapsedTime by remember { mutableLongStateOf(0) }
+    var isTracking by remember { mutableStateOf(false) }
+    var currentTrackingSkillId by remember { mutableStateOf<String?>(null) }
+    val timeUpdateReceiver = remember { TimeUpdateReceiver() }
+
+    // Check if service is already running for this skill
+    LaunchedEffect(Unit) {
+        val isServiceRunning = isServiceRunning(context, TimerForegroundService::class.java)
+        isTracking = isServiceRunning
+    }
+
+    DisposableEffect(Unit) {
+        val filter = IntentFilter(TimerForegroundService.ACTION_UPDATE_TIME)
+        context.registerReceiver(timeUpdateReceiver, filter)
+
+        onDispose {
+            context.unregisterReceiver(timeUpdateReceiver)
+        }
+    }
+
+    LaunchedEffect(timeUpdateReceiver) {
+        snapshotFlow { timeUpdateReceiver.currentTime to timeUpdateReceiver.currentSkillId }
+            .collect { (time, skillId) ->
+                elapsedTime = time
+                currentTrackingSkillId = skillId
+                isTracking = skillId == skillDto.skillId
+            }
+    }
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -207,44 +240,78 @@ private fun SectionTracking(
     ) {
         ButtonPrimary(
             onClick = {
-                if (tracker.isRunning) {
-                    tracker.stop()
-                    if (time.longValue > 0) {
-                        skillService.addTrackHistoryBySkillId(
-                            HistorySkill(
-                                UUID.randomUUID().toString(),
-                                skillDto.skillId,
-                                time.longValue,
-                                LocalDate.now()
+                if (isTracking) {
+                    // Stop tracking only if this is the currently tracked skill
+                    if (currentTrackingSkillId == skillDto.skillId) {
+                        val stopIntent = Intent(context, TimerForegroundService::class.java).apply {
+                            action = TimerForegroundService.ACTION_STOP_TIMER
+                            putExtra(TimerForegroundService.EXTRA_SKILL_ID, skillDto.skillId)
+                        }
+                        context.startService(stopIntent)
+
+                        if (elapsedTime > 0) {
+                            skillService.addTrackHistoryBySkillId(
+                                HistorySkill(
+                                    UUID.randomUUID().toString(),
+                                    skillDto.skillId,
+                                    elapsedTime,
+                                    LocalDate.now()
+                                )
                             )
-                        )
+                        }
+                        elapsedTime = 0
+                        onTimerStop()
                     }
-                    time.longValue = 0
-                    showTimer = false
-                    onTimerStop()
-
-                    val stopIntent = Intent(context, TimerForegroundService::class.java).apply {
-                        action = TimerForegroundService.ACTION_STOP_TIMER
-                    }
-                    context.startService(stopIntent)
                 } else {
-                    tracker.start(time)
-                    showTimer = true
-
-                    val startIntent = Intent(context, TimerForegroundService::class.java)
-                    context.startForegroundService(startIntent)
+                    // Start tracking this skill
+                    val startIntent = Intent(context, TimerForegroundService::class.java).apply {
+                        action = TimerForegroundService.ACTION_START_TIMER
+                        putExtra(TimerForegroundService.EXTRA_SKILL_ID, skillDto.skillId)
+                        putExtra(TimerForegroundService.EXTRA_SKILL_NAME, skillDto.name)
+                    }
+                    ContextCompat.startForegroundService(context, startIntent)
                 }
+                isTracking = !isTracking
             },
-            containerColor = if (tracker.isRunning) ButtonBackActiveColorLight else PrimaryAccentColorLight,
+            containerColor = if (isTracking && currentTrackingSkillId == skillDto.skillId)
+                ButtonBackActiveColorLight
+            else
+                PrimaryAccentColorLight,
             contentColor = Color.White,
-            icon = if (tracker.isRunning) R.drawable.pause else R.drawable.play,
-            textContent = if (tracker.isRunning) "Stop" else "Start",
+            icon = if (isTracking && currentTrackingSkillId == skillDto.skillId)
+                R.drawable.pause
+            else
+                R.drawable.play,
+            textContent = if (isTracking && currentTrackingSkillId == skillDto.skillId)
+                "Stop"
+            else
+                "Start",
         )
 
-        if (showTimer) {
-            TimerDisplay(time.longValue, tracker.isRunning)
+        if (isTracking && currentTrackingSkillId == skillDto.skillId) {
+            TimerDisplay(elapsedTime, true)
         }
     }
+}
+
+class TimeUpdateReceiver : BroadcastReceiver() {
+    var currentTime by mutableLongStateOf(0L)
+        private set
+    var currentSkillId by mutableStateOf<String?>(null)
+        private set
+
+    override fun onReceive(context: Context, intent: Intent) {
+        if (intent.action == TimerForegroundService.ACTION_UPDATE_TIME) {
+            currentTime = intent.getLongExtra(TimerForegroundService.EXTRA_TIME_VALUE, 0L)
+            currentSkillId = intent.getStringExtra(TimerForegroundService.EXTRA_SKILL_ID)
+        }
+    }
+}
+
+fun isServiceRunning(context: Context, serviceClass: Class<*>): Boolean {
+    val manager = context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+    return manager.getRunningServices(Integer.MAX_VALUE)
+        .any { it.service.className == serviceClass.name }
 }
 
 @Composable

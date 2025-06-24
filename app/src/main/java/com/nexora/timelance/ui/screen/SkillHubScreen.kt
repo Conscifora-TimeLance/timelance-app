@@ -64,7 +64,10 @@ private fun PreviewScreen() {
 data class SkillHubState(
     val skills: List<SkillDto> = emptyList(),
     val isLoading: Boolean = true,
-    val error: String? = null
+    val error: String? = null,
+    val currentTagIdFilter: String? = null,
+    val isSearchActive: Boolean = false,
+    val searchQuery: String = ""
 )
 
 @Composable
